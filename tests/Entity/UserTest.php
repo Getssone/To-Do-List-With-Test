@@ -28,6 +28,7 @@ class UserTest extends KernelTestCase
             'data set 3' => ['TotoDu07'],
         ];
     }
+
     public static function FakeBadUsernameProvider(): array
     {
         return [
@@ -57,7 +58,6 @@ class UserTest extends KernelTestCase
         // $this->assertNull($existingUser, "Le nom d'utilisateur '$usernameTest' devrait être unique");
     }
 
-
     /**
      * @dataProvider FakeGoodUsernameProvider
      * @testDox('utilise $username')]
@@ -68,6 +68,7 @@ class UserTest extends KernelTestCase
         $user->setUsername($username);
         $this->testUsername($user, $username);
     }
+
     /**
      * @dataProvider FakeBadUsernameProvider
      * @testDox('utilise $username')]
@@ -79,7 +80,6 @@ class UserTest extends KernelTestCase
         $this->testUsername($user, $username);
     }
 
-
     public static function FakeGoodUserMailProvider(): array
     {
         return [
@@ -87,6 +87,7 @@ class UserTest extends KernelTestCase
             'data set 2' => ['1@1.fr'],
         ];
     }
+
     public static function FakeBadUserMailProvider(): array
     {
         return [
@@ -108,7 +109,6 @@ class UserTest extends KernelTestCase
         $this->assertLessThanOrEqual(64, strlen($user->getEmail()), "Cette variable devrait avoir max 64 caractère");
         $this->assertMatchesRegularExpression('/^.+@.+\..+$/', $user->getEmail(), "L'email devrait être valide et non vide");
     }
-
 
     /**
      * @dataProvider FakeGoodUserMailProvider
@@ -226,5 +226,246 @@ class UserTest extends KernelTestCase
         $user = new User();
         $user->setRoles($role);
         $this->testRoles($user);
+    }
+    public static function FakeUsernameWithExpectedErrorsProvider(): array
+    {
+        return [
+            'data set 1' => ['john', 0],
+            'data set 2' => ['JANE', 0],
+            'data set 3' => ['TotoDu07', 0],
+            'data set 4' => ['#*#*', 2],
+            'data set 5' => ['', 1],
+            'data set 6' => [1, 1],
+            'data set 7' => [0, 2],
+            'data set 8' => [NAN, 1],
+            'data set 9' => ['<script>"Protection"</script>', 1],
+            'data set 10' => [null, 3],
+        ];
+    }
+
+    /**
+     * @dataProvider FakeUsernameWithExpectedErrorsProvider
+     * @testDox('utilise $usernameTest et $expectedErrors')]
+     */
+    public function testUsernameWithExpectedErrors($usernameTest, $expectedErrors)
+    {
+        $actualErrors = 0;
+
+        try {
+            $this->assertNotEmpty($usernameTest, "Cette variable devrait avoir min:1 caractère jusqu'à max: 64");
+        } catch (PHPUnit\Framework\AssertionFailedError) {
+            $actualErrors++;
+        }
+        try {
+            $this->assertIsString($usernameTest, "Cette variable devrait être une string");
+        } catch (PHPUnit\Framework\AssertionFailedError) {
+            $actualErrors++;
+        }
+        if (is_string($usernameTest)) {
+            try {
+                $this->assertLessThanOrEqual(64, strlen($usernameTest), "Cette variable devrait avoir max 64 caractère");
+            } catch (PHPUnit\Framework\AssertionFailedError) {
+                $actualErrors++;
+            }
+            try {
+                $this->assertMatchesRegularExpression(
+                    '/^[a-zA-Z0-9_-]*$/',
+                    $usernameTest,
+                    "Cette variable ne doit contenir que des lettres, des chiffres, des tirets bas (_) et des tirets (-)."
+                );
+            } catch (PHPUnit\Framework\AssertionFailedError) {
+                $actualErrors++;
+            }
+        }
+        try {
+            $this->assertNotEquals("#*#*", $usernameTest, "Cette variable devrait être une string");
+        } catch (PHPUnit\Framework\AssertionFailedError $e) {
+            $actualErrors++;
+        }
+        try {
+            $this->assertNotNull($usernameTest, "ne peut être null");
+        } catch (PHPUnit\Framework\AssertionFailedError $e) {
+            $actualErrors++;
+        }
+
+        $this->assertEquals($expectedErrors, $actualErrors, "Le nombre d'erreurs n'est pas celui attendu.");
+    }
+
+    public static function FakeEmailWithExpectedErrorsProvider(): array
+    {
+        return [
+            'data set 1' => ['john@doe.fr', 0],
+            'data set 2' => ['1@1.fr', 0],
+            'data set 3' => ['@doe.fr', 1],
+            'data set 4' => ['a@.fr', 1],
+            'data set 5' => ['@.fr', 1],
+            'data set 6' => ['@', 2],
+            'data set 7' => ['.fr', 1],
+            'data set 8' => ['', 3],
+            'data set 9' => [null, 3],
+        ];
+    }
+    /**
+     * @dataProvider FakeEmailWithExpectedErrorsProvider
+     * @testDox('utilise $emailTest et $expectedErrors')]
+     */
+    public function testEmailWithExpectedErrors($emailTest, $expectedErrors)
+    {
+        $actualErrors = 0;
+
+        try {
+            $this->assertNotEmpty($emailTest, "Cette variable devrait avoir min:1 caractère jusqu'à max: 64");
+        } catch (PHPUnit\Framework\AssertionFailedError) {
+            $actualErrors++;
+        }
+        try {
+            $this->assertIsString($emailTest, "Cette variable devrait être une string");
+        } catch (PHPUnit\Framework\AssertionFailedError) {
+            $actualErrors++;
+        }
+        if (is_string($emailTest)) {
+            try {
+                $this->assertGreaterThan(1, strlen($emailTest), "Cette variable devrait avoir min 1 caractère");
+            } catch (PHPUnit\Framework\AssertionFailedError) {
+                $actualErrors++;
+            }
+            try {
+                $this->assertLessThanOrEqual(64, strlen($emailTest), "Cette variable devrait avoir max 64 caractère");
+            } catch (PHPUnit\Framework\AssertionFailedError) {
+                $actualErrors++;
+            }
+            try {
+                $this->assertMatchesRegularExpression('/^.+@.+\..+$/', $emailTest, "L'email devrait être valide et non vide");
+            } catch (PHPUnit\Framework\AssertionFailedError $e) {
+                $actualErrors++;
+            }
+        }
+        try {
+            $this->assertNotNull($emailTest, "ne peut être null");
+        } catch (PHPUnit\Framework\AssertionFailedError $e) {
+            $actualErrors++;
+        }
+
+        $this->assertEquals($expectedErrors, $actualErrors, "Le nombre d'erreurs n'est pas celui attendu.");
+    }
+
+    public static function FakePasswordWithExpectedErrorsProvider(): array
+    {
+        return [
+            'data set 1' => ['testValide', 0],
+            'data set 2' => [123456, 1],
+            'data set 3' => ['p', 2],
+            'data set 4' => ['password123', 2],
+            'data set 5' => ['$2y$10$toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong!', 2],
+            'data set 6' => ['', 3],
+            'data set 7' => ['$2y$10$eW5IYzE2cm5IYzE2cm5IdUJlUnJlb3JsWGVmV1d1WnFnWUlXZXNh', 1],
+            'data set 8' => [null, 3],
+        ];
+    }
+
+    /**
+     * @dataProvider FakePasswordWithExpectedErrorsProvider
+     * @testDox('utilise $passwordTest et $expectedErrors')]
+     */
+    public function testPasswordWithExpectedErrors($passwordTest, $expectedErrors)
+    {
+        $actualErrors = 0;
+        if ('testValide' === $passwordTest) {
+            $passwordTest = password_hash($passwordTest, PASSWORD_BCRYPT);
+        }
+
+        try {
+            $this->assertNotEmpty($passwordTest, "Cette variable devrait avoir min:12 caractère jusqu'à max: 64");
+        } catch (PHPUnit\Framework\AssertionFailedError) {
+            $actualErrors++;
+        }
+        try {
+            $this->assertIsString($passwordTest, "Cette variable devrait être une string");
+        } catch (PHPUnit\Framework\AssertionFailedError) {
+            $actualErrors++;
+        }
+        if (is_string($passwordTest)) {
+            try {
+                $this->assertGreaterThan(12, strlen($passwordTest), "Cette variable devrait avoir min 12 caractère");
+            } catch (PHPUnit\Framework\AssertionFailedError) {
+                $actualErrors++;
+            }
+            try {
+                $this->assertLessThanOrEqual(180, strlen($passwordTest), "Cette variable devrait avoir max 180 caractère");
+            } catch (PHPUnit\Framework\AssertionFailedError) {
+                $actualErrors++;
+            }
+            try {
+                $this->assertMatchesRegularExpression(
+                    '/^\$2[ayb]\$.{56}$/',
+                    $passwordTest,
+                    "Le mot de passe doit être un hash bcrypt valide."
+                );
+            } catch (PHPUnit\Framework\AssertionFailedError $e) {
+                $actualErrors++;
+            }
+        }
+        try {
+            $this->assertNotNull($passwordTest, "ne peut être null");
+        } catch (PHPUnit\Framework\AssertionFailedError $e) {
+            $actualErrors++;
+        }
+
+        $this->assertEquals($expectedErrors, $actualErrors, "Le nombre d'erreurs n'est pas celui attendu.");
+    }
+
+    public static function FakeRolesWithExpectedErrorsProvider(): array
+    {
+        return [
+            'data set 1' => [['ROLE_USER'], 0],
+            'data set 2' => [['ROLE_USER', 'ROLE_ADMIN'], 0],
+            'data set 4' => ['', 2],
+            'data set 5' => [[123456], 1], //Un role numérique
+            'data set 6' => [[''], 1], //Un tableau avec une chaîne vide
+            'data set 7' => [null, 3], //Un tableau avec une chaîne vide
+        ];
+    }
+
+    /**
+     * @dataProvider FakeRolesWithExpectedErrorsProvider
+     * @testDox('utilise $rolesTest et $expectedErrors')]
+     */
+    public function testRolesWithExpectedErrors($rolesTest, $expectedErrors)
+    {
+        $actualErrors = 0;
+
+        try {
+            $this->assertNotEmpty($rolesTest, "Le rôle devrait être non vide");
+        } catch (PHPUnit\Framework\AssertionFailedError) {
+            $actualErrors++;
+        }
+        try {
+            $this->assertIsArray($rolesTest, "Le/Les rôle(s) doivent être un tableau");
+        } catch (PHPUnit\Framework\AssertionFailedError) {
+            $actualErrors++;
+        }
+        if (is_array($rolesTest)) {
+            try {
+                foreach ($rolesTest as $role) {
+                    $this->assertIsString($role, "Chaque rôle doivent être une chaîne");
+                }
+            } catch (PHPUnit\Framework\AssertionFailedError) {
+                $actualErrors++;
+            }
+            try {
+                foreach ($rolesTest as $role) {
+                    $this->assertNotEmpty($role, "Chaque rôle ne doit pas être une chaîne vide");
+                }
+            } catch (PHPUnit\Framework\AssertionFailedError) {
+                $actualErrors++;
+            }
+        }
+        try {
+            $this->assertNotNull($rolesTest, "ne peut être null");
+        } catch (PHPUnit\Framework\AssertionFailedError $e) {
+            $actualErrors++;
+        }
+
+        $this->assertEquals($expectedErrors, $actualErrors, "Le nombre d'erreurs n'est pas celui attendu.");
     }
 }
