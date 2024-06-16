@@ -18,7 +18,7 @@ class Task
     private ?int $id = null;
 
     /**
-     * @var string A "Y-m-d H:i:s" formatted value
+     * @var DateTime A "Y-m-d H:i:s" formatted value
      */
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
     #[Assert\NotBlank(message: "Vérifier dans votre contrôleur qu'une date de création est bien renseigné")]
@@ -27,7 +27,7 @@ class Task
 
     #[ORM\Column(length: 180, nullable: false)]
     #[Assert\NotBlank(message: "Un titre est obligatoire")]
-    #[Assert\Length(max: 180)]
+    #[Assert\Length(min: 1, max: 180)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: false)]
@@ -48,12 +48,12 @@ class Task
         return $this->id;
     }
 
-    public function getCreatedAt(): DateTimeInterface
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeInterface $createdAt): static
+    public function setCreatedAt(DateTime $createdAt): static
     {
         $this->createdAt = $createdAt;
 
@@ -84,15 +84,18 @@ class Task
         return $this;
     }
 
-    public function isDone(): ?bool
+    public function getIsDone(): ?bool
     {
         return $this->isDone;
     }
 
-    public function setDone(bool $isDone): static
+    public function setIsDone(bool $isDone): static
     {
-        $this->isDone = $isDone;
+        if (!is_bool($isDone)) {
+            throw new \InvalidArgumentException("La valeur de 'isDone' doit être un booléen.");
+        }
 
+        $this->isDone = $isDone;
         return $this;
     }
 

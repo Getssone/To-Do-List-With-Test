@@ -62,7 +62,7 @@ class UserTest extends KernelTestCase
      * @dataProvider FakeGoodUsernameProvider
      * @testDox('utilise $username')]
      */
-    public function testValidUsername($username)
+    public function testValideUsername($username)
     {
         $user = new User();
         $user->setUsername($username);
@@ -73,7 +73,7 @@ class UserTest extends KernelTestCase
      * @dataProvider FakeBadUsernameProvider
      * @testDox('utilise $username')]
      */
-    public function testInvalidUsername($username)
+    public function testInvalideUsername($username)
     {
         $user = new User();
         $user->setUsername($username);
@@ -114,7 +114,7 @@ class UserTest extends KernelTestCase
      * @dataProvider FakeGoodUserMailProvider
      * @testDox('utilise $email')]
      */
-    public function testValidEmail($email)
+    public function testValideEmail($email)
     {
         $user = new User();
         $user->setEmail($email);
@@ -124,22 +124,32 @@ class UserTest extends KernelTestCase
      * @dataProvider FakeBadUserMailProvider
      * @testDox('utilise $email')]
      */
-    public function testInvalidEmail($email)
+    public function testInvalideEmail($email)
     {
         $user = new User();
         $user->setEmail($email);
         $this->testEmail($user);
     }
 
-    public static function FakePasswordProvider(): array
+    public static function FakeGoodPasswordProvider(): array
+    {
+        return [
+            'data set 2' => [123456789101112], //Un mot de passe numérique
+            'data set 3' => ['123456789101112'], //Un mot de passe simple sans aucun hash
+            'data set 4' => ['passwords123!'], //Un mot de passe simple sans aucun hash
+            'data set 5' => ['$azdazd4453467qscazd!'], //Un faux hash trop long.
+            'data set 6' => ['$2y$10$azedsd146a5z4d50'], //Un faux hash avec un préfixe dollar 
+            // 'data set 7' => [], //Une chaîne vide
+        ];
+    }
+    public static function FakeBadPasswordProvider(): array
     {
         return [
             'data set 1' => [''], //Une chaîne vide
-            'data set 2' => [123456], //Un mot de passe numérique
-            'data set 3' => ['p'], //Un mot de passe simple sans aucun hash
-            'data set 4' => ['password123'], //Un mot de passe simple sans aucun hash
-            'data set 5' => ['$2y$10$toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong!'], //Un faux hash trop long.
-            'data set 6' => ['$2y$10$toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong'], //Un faux hash avec un préfixe dollar 
+            'data set 2' => ['p'], //Un mot de passe simple sans aucun hash
+            'data set 3' => ['password123'], //Un mot de passe simple sans aucun hash
+            'data set 4' => ['$2y$10$toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong!'], //Un faux hash trop long.
+            'data set 5' => [], //Une chaîne vide
         ];
     }
 
@@ -149,6 +159,7 @@ class UserTest extends KernelTestCase
         $this->assertIsString($user->getPassword(), "Cette variable devrait être une string");
         $this->assertGreaterThan(12, strlen($user->getPassword()), "Cette variable devrait avoir min 12 caractère");
         $this->assertLessThanOrEqual(180, strlen($user->getPassword()), "Cette variable devrait avoir max 180 caractère");
+        $user->setPassword(password_hash($user->getPassword(), PASSWORD_BCRYPT));
         $this->assertMatchesRegularExpression(
             '/^\$2[ayb]\$.{56}$/',
             $user->getPassword(),
@@ -158,20 +169,20 @@ class UserTest extends KernelTestCase
 
 
     /**
-     * @dataProvider FakePasswordProvider
+     * @dataProvider FakeGoodPasswordProvider
      * @testDox('utilise $password')]
      */
-    public function testValidPassword($password)
+    public function testValidePassword($password)
     {
         $user = new User();
-        $user->setPassword(password_hash($password, PASSWORD_BCRYPT));
+        $user->setPassword($password);
         $this->testPassword($user);
     }
     /**
-     * @dataProvider FakePasswordProvider
+     * @dataProvider FakeBadPasswordProvider
      * @testDox('utilise $password')]
      */
-    public function testInvalidPassword($password)
+    public function testInvalidePassword($password)
     {
         $user = new User();
         $user->setPassword($password);
@@ -211,7 +222,7 @@ class UserTest extends KernelTestCase
      * @dataProvider FakeGoodRoleProvider
      * @testDox('utilise $role')]
      */
-    public function testValidRoles($role)
+    public function testValideRoles($role)
     {
         $user = new User();
         $user->setRoles($role);
@@ -221,7 +232,7 @@ class UserTest extends KernelTestCase
      * @dataProvider FakeBadRoleProvider
      * @testDox('utilise $roles')]
      */
-    public function testInvalidRoles($role)
+    public function testInvalideRoles($role)
     {
         $user = new User();
         $user->setRoles($role);
