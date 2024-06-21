@@ -3,11 +3,53 @@
 use App\Entity\Task;
 use PHPUnit\Framework\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Validator\Constraints\Length;
 
 use function PHPUnit\Framework\throwException;
 
 class TaskTest extends KernelTestCase
 {
+
+    public function getEntity($dateTest, $titleTest, $contentTest, $isDone)
+    {
+        $task = new Task();
+        return $task->setCreatedAt($dateTest)->setTitle($titleTest)->setContent($contentTest)->setIsDone($isDone);
+    }
+
+    public static function FakeTask(): array
+    {
+        return [
+            'data set 1' => [new DateTime(), 'Le chat', 'Penser à gratouiller le chat', true, 0],
+            'data set 2' => [new DateTime('2023-06-01 14:36:01'), 'repas', 'penser a faire le repas', false, 0],
+            'data set 3' => [new \DateTime('2024-06-01 14:36:01'), 'Coder', 'Apprendre a coder en PHP', true, 0],
+            'data set 4' => ['e', '', '', 123456, 4],
+            'data set 5' => [1, 1, 0, 'zdok', 1],
+            'data set 6' => [0, '#*#*', '<script>"Protection"</script>', NAN, 1],
+            'data set 7' => ['<script>"Protection"</script>', NAN, null, '', 2],
+            'data set 8' => [null, '<script>"Protection"</>', '.fr', null, 3],
+            'data set 9' => ['2022-12-25 14:36:01', null, '', '$2y$10$eW5IYzE2cm5IYzE2cm5IdUJlUnJlb3JsWGVmV1d1WnFnWUlXZXNh', 1],
+            'data set 10' => ['date', 'TotoDu07', null, null, 1],
+        ];
+    }
+
+    /**
+     * @dataProvider FakeTask
+     * @testDox('utilise $dateTest, $titleTest, $contentTest, $isDone et $errorsExpected')]
+     */
+    public function testValidatorTask($dateTest, $titleTest, $contentTest, $isDone, $errorsExpected): void
+    {
+        self::bootKernel();
+        $container = static::getContainer();
+        $task = $this->getEntity($dateTest, $titleTest, $contentTest, $isDone, $errorsExpected);
+        $errors = $container->get('validator')->validate($task);
+        $messages = [];
+        foreach ($errors as $error) {
+            $messages = $error ? $error->getPropertyPath() . '=>' . $error->getMessage() : '';
+        }
+        $infoMessages = empty($messages) ? '' : $messages;
+        $this->assertCount($errorsExpected, $errors, $infoMessages);
+    }
+
     public static function FakeGoodDateTimeInterfaceProvider(): array
     {
         return [

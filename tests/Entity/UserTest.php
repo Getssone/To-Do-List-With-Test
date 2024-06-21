@@ -5,20 +5,54 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 // use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\ErrorHandler\Error\UndefinedMethodError;
 
 class UserTest extends KernelTestCase
 {
 
-    // private $entityManager;
+    // Revoir : https://www.youtube.com/watch?v=fMiB8iVxhfw a 6:15
 
-    // public function __construct(EntityManagerInterface $entityManager)
-    // {
-    //     $this->entityManager = $entityManager;
-    //     parent::__construct();
-    // }
+    public function getEntity($usernameTest, $email, $password)
+    {
+        $user = new User();
+        return $user->setUsername($usernameTest)->setEmail($email)->setPassword($password);
+    }
+    public static function FakeUser(): array
+    {
+        return [
+            'data set 1' => ['john', 'john@doe.fr', password_hash('secretValide', PASSWORD_BCRYPT),  0],
+            'data set 2' => ['JANE', '1@1.fr', password_hash('secret', PASSWORD_BCRYPT), 0],
+            'data set 3' => ['TotoDu07', 'TotoDu07@s.fr', password_hash('secretValide125sd!', PASSWORD_BCRYPT), 0],
+            'data set 4' => ['', '@doe.fr', 123456, 3],
+            'data set 5' => [1, '', 'p', 2],
+            'data set 6' => ['#*#*', '@.fr', 'password123', 2],
+            'data set 7' => [NAN, '@', '$2y$10$toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong!', 2],
+            'data set 8' => ['<script>"Protection"</script>', '.fr', '', 3],
+            'data set 9' => [null, '', '$2y$10$eW5IYzE2cm5IYzE2cm5IdUJlUnJlb3JsWGVmV1d1WnFnWUlXZXNh', 1],
+            'data set 10' => ['TotoDu07', null, null, 1],
+        ];
+    }
+
+    /**
+     * @dataProvider FakeUser
+     * @testDox('utilise $usernameTest, $email, $password et $errorsExpected')]
+     */
+    public function testValidatorUser($usernameTest, $email, $password, $errorsExpected): void
+    {
+        self::bootKernel();
+        $container = static::getContainer();
+        $user = $this->getEntity($usernameTest, $email, $password);
+        $errors = $container->get('validator')->validate($user);
+        $messages = [];
+        foreach ($errors as $error) {
+            $messages = $error ? $error->getPropertyPath() . '=>' . $error->getMessage() : '';
+        }
+        $infoMessages = empty($messages) ? '' : $messages;
+        $this->assertCount($errorsExpected, $errors, $infoMessages);
+    }
+
+
 
     public static function FakeGoodUsernameProvider(): array
     {
@@ -53,7 +87,8 @@ class UserTest extends KernelTestCase
             $usernameTest,
             "Cette variable ne doit contenir que des lettres, des chiffres, des tirets bas (_) et des tirets (-)."
         );
-        // $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $usernameTest]);
+        // $existingUser = static::getContainer()->get('doctrine.orm.entity_manager')->findOneBy(['username' => $usernameTest]);
+
         // // Si $existingUser = Null c'est qu'il n'est pas dans la BDD
         // $this->assertNull($existingUser, "Le nom d'utilisateur '$usernameTest' devrait être unique");
     }
@@ -301,6 +336,7 @@ class UserTest extends KernelTestCase
 
         $this->assertEquals($expectedErrors, $actualErrors, "Le nombre d'erreurs n'est pas celui attendu.");
     }
+
 
     public static function FakeEmailWithExpectedErrorsProvider(): array
     {

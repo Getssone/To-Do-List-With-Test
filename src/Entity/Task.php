@@ -17,12 +17,9 @@ class Task
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var DateTime A "Y-m-d H:i:s" formatted value
-     */
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
     #[Assert\NotBlank(message: "Vérifier dans votre contrôleur qu'une date de création est bien renseigné")]
-    #[Assert\DateTime]
+    // #[Assert\DateTime]
     private ?DateTimeInterface $createdAt = null;
 
     #[ORM\Column(length: 180, nullable: false)]
@@ -55,6 +52,9 @@ class Task
 
     public function setCreatedAt(DateTime $createdAt): static
     {
+        if ($createdAt === null) {
+            $this->createdAt = new DateTime();
+        }
         $this->createdAt = $createdAt;
 
         return $this;
@@ -89,7 +89,7 @@ class Task
         return $this->isDone;
     }
 
-    public function setIsDone(bool $isDone): static
+    public function setIsDone(bool $isDone = false): static
     {
         if (!is_bool($isDone)) {
             throw new \InvalidArgumentException("La valeur de 'isDone' doit être un booléen.");
