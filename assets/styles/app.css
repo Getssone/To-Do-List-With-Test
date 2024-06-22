@@ -1,3 +1,7 @@
+@import url("./base.css");
 body {
-    background-color: skyblue;
+  background-color: skyblue;
+}
+img {
+  width: 2rem;
 }

@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	<h1>Bienvenue sur Todo List, l'application vous permettant de gérer l'ensemble de vos tâches sans effort !</h1>
+	Welcome To Do List !
 {% endblock %}
 
 {% block body %}
@@ -18,9 +18,11 @@
 		}
 	</style>
 
-	<div class="row">
-		{# <a href="{{ path('task_create') }}" class="btn btn-success">Créer une nouvelle tâche</a> #}
-		{# <a href="{{ path('task_list') }}" class="btn btn-info">Consulter la liste des tâches à faire</a> #}
-			<a href="" class="btn btn-secondary"> Consulter la liste des tâches terminées</a>
+	<div class="row d-flex gap-3">
+		<a class="newTasks btn btn-success" href="#">Créer une nouvelle tâche</a>
+		{# <a class="newTasks" href="{{ path('task_create') }}" class="btn btn-success">Créer une nouvelle tâche</a> #}
+		<a class="toDoTasks btn btn-info" href="#">Consulter la liste des tâches à faire</a>
+		{# <a class="toDoTasks" href="{{ path('task_list') }}" class="btn btn-info">Consulter la liste des tâches à faire</a> #}
+			<a class="completedTasks btn btn-secondary" href="#" > Consulter la liste des tâches terminées</a>
 	</div>
 {% endblock %}
