@@ -352,6 +352,7 @@ class UserTest extends KernelTestCase
             'data set 9' => [null, 3],
         ];
     }
+
     /**
      * @dataProvider FakeEmailWithExpectedErrorsProvider
      * @testDox('utilise $emailTest et $expectedErrors')]

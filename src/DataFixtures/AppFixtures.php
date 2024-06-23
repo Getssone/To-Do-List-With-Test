@@ -2,20 +2,29 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    public function load(ObjectManager $manager): void
+    private $passwordHasher;
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
     {
-        // $someService = $this->container->get(SomeService::class);
-        // $someService->doSomething();
-        // Votre logique de fixtures ici
+        $this->passwordHasher = $passwordHasher;
+    }
 
-        // $product = new Product();
-        // $manager->persist($product);
+    public function load(ObjectManager $manager)
+    {
+        $user = new User();
+        $user->setEmail('test@example.com');
+        $user->setUsername('validusername');
+        $user->setPassword($this->passwordHasher->hashPassword($user, 'validpassword123'));
+        $user->setRoles(['ROLE_USER']);
 
+        $manager->persist($user);
         $manager->flush();
     }
 }

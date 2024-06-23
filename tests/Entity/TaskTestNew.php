@@ -4,8 +4,11 @@ namespace App\Tests\Entity;
 
 use App\Entity\Task;
 use DateTime;
+use Exception;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Validator\ConstraintViolation;
+use TypeError;
 
 class TaskTestNew extends KernelTestCase
 {
@@ -36,28 +39,34 @@ class TaskTestNew extends KernelTestCase
         $this->assertHasErrors($this->getEntity(), 0);
     }
 
-    public function testInvalidCreatedAtEntity()
+    public function testInvalidCreatedAtString(): void
     {
         $task = $this->getEntity();
 
-        try {
-            $task->setCreatedAt(new \DateTime('datetime'));
-            // $this->assertHasErrors($task, 1);
-        } catch (\Throwable $e) {
-            $this->assertTrue(true);
-        }
-        try {
-            $this->assertHasErrors($task->setCreatedAt('datetime'), 1); // 
-            // $this->assertHasErrors($task, 1);
-        } catch (\Throwable $e) {
-            $this->assertTrue(true);
-        }
-        try {
-            $task->setCreatedAt(null);
-            // $this->assertHasErrors($task, 1);
-        } catch (\Throwable $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Failed to parse time string (datetime) at position 0 (d): The timezone could not be found in the database');
+
+        $task->setCreatedAt(new \DateTime('datetime'));
+    }
+
+    public function testInvalidCreatedAtTypeString(): void
+    {
+        $task = $this->getEntity();
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('App\Entity\Task::setCreatedAt(): Argument #1 ($createdAt) must be of type DateTime, string given, called in');
+
+        $task->setCreatedAt('datetime');
+    }
+
+    public function testInvalidCreatedAtTypeNull(): void
+    {
+        $task = $this->getEntity();
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('App\Entity\Task::setCreatedAt(): Argument #1 ($createdAt) must be of type DateTime, null given, called in');
+
+        $task->setCreatedAt(null);
     }
 
     public function testInvalidTitleEntity()

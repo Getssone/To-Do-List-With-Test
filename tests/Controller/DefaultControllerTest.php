@@ -2,6 +2,8 @@
 
 namespace Tests\AppBundle\Controller;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 
@@ -9,14 +11,16 @@ class DefaultControllerTest extends WebTestCase
 {
     private  $client;
     private  $urlGenerator;
+    private $userRepository;
 
     public function setUp(): void
     {
         $this->client = static::createClient();
         $this->urlGenerator = $this->client->getContainer()->get('router');
+        $this->userRepository = static::getContainer()->get(UserRepository::class);
     }
 
-    public function crawlerPath($path)
+    public function crawlerGetPath($path)
     {
         return $this->client->request('GET', $this->urlGenerator->generate($path));
     }
@@ -38,9 +42,9 @@ class DefaultControllerTest extends WebTestCase
         return $crawler->filter($LinkContent)->link()->getUri();
     }  //function plus précise 
 
-    public function testBase()
+    public function testBasePage()
     {
-        $crawler =  $this->crawlerPath('homepage');
+        $crawler =  $this->crawlerGetPath('homepage');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         $CDNBootstrap = $crawler->filter('html link')->matches('.CDNBootstrap');
@@ -59,6 +63,16 @@ class DefaultControllerTest extends WebTestCase
         $linkNavBar = $this->getLinkClass($crawler, 'navbar-brand');
         $this->assertSame('http://localhost/#', $linkNavBar);
 
+        $linkUserCreate = $this->getLinkClass($crawler, 'userCreate');
+        $this->assertSame('http://localhost/#', $linkUserCreate);
+
+        $linkUserLogin = $this->getLinkClass($crawler, 'userLogin');
+        $this->assertSame('http://localhost/#', $linkUserLogin);
+
+        $linkUserLogout = $this->getLinkClass($crawler, 'userLogout');
+        $this->assertSame('http://localhost/#', $linkUserLogout);
+
+
         $this->assertSame(2, $crawler->filterXPath('//*[contains(text(), "List")]')->count()); //  XPath sélectionne tous les éléments qui contiennent le texte "List" puis compte le nombre d'éléments correspondants.
         $this->assertSelectorTextContains('p', 'Copyright © Getssone');
 
@@ -68,7 +82,7 @@ class DefaultControllerTest extends WebTestCase
 
     public function testHomePage()
     {
-        $crawler =  $this->crawlerPath('homepage');
+        $crawler =  $this->crawlerGetPath('homepage');
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         $this->assertPageTitleContains('Welcome To Do List !');
@@ -84,53 +98,29 @@ class DefaultControllerTest extends WebTestCase
     }  //function plus précise 
 
     // Connexion
-    // public function testExistLinkToConnexionIfLoggedOut()
-    // {
-    //     $this->assertSelectorExists("a[href='/login']");
-    // }
-
-    // public function testNotExistLinkToConnexionIfLoggedIn()
-    // {
-    //     $loggedClient = self::createClient([], [
-    //         'PHP_AUTH_USER' => 'gets@mail.fr',
-    //         'PHP_AUTH_PW' => 'gets'
-    //     ]);
-
-    //     $loggedClient->request("GET", "/");
-
-    //     $this->assertSelectorNotExists("a[href='/login']");
-    // }
+    public function testLinkConnexionIfLoggedOut()
+    {
+        $this->crawlerGetPath('homepage');
+        $this->assertSelectorExists("a[href='/login']");
+        $this->assertSelectorNotExists("a[href='/logout']");
+    }
 
     // // Deconnexion
-    // public function testExistLinkToDeconnexionIfLoggedIn()
-    // {
-    //     $loggedClient = self::createClient([], [
-    //         'PHP_AUTH_USER' => 'gets@mail.fr',
-    //         'PHP_AUTH_PW' => 'gets'
-    //     ]);
+    public function testLinkToConnexionIfLoggedIn()
+    {
+        $testUser = $this->userRepository->findOneByEmail('test@example.com');
 
-    //     $loggedClient->request("GET", "/");
+        // Vérifier que l'utilisateur n'est pas null
+        $this->assertNotNull($testUser, 'L\'utilisateur doit être présent dans la base de données.');
 
-    //     $this->assertSelectorExists("a[href='/logout']");
-    // }
+        $this->client->loginUser($testUser);
 
-    // public function testNotExistsLinkToDeconnexionIfLoggedOut()
-    // {
-    //     $client = self::createClient();
+        $this->crawlerGetPath('homepage');
 
-    //     $client->request("GET", "/");
+        $this->assertResponseIsSuccessful();
 
-    //     $this->assertSelectorNotExists("a[href='/logout']");
-    // }
+        $this->assertSelectorExists("a[href='/logout']");
 
-
-    // public function testHomePageGeneral()
-    // {
-    //     $client = static::createClient();
-    //     $crawler = $client->request('GET', '/');
-
-    //     $this->assertResponseIsSuccessful(); //Vérifie que la réponse HTTP est une réponse réussie (code de statut dans la plage 200-299).
-
-    //     $this->assertSelectorTextContains('h1', 'DefaultController');
-    // } //function plus général 
+        $this->assertSelectorNotExists("a[href='/login']");
+    }
 }

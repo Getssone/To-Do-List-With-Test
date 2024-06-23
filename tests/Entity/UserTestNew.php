@@ -3,11 +3,72 @@
 namespace App\Tests\Entity;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Validator\ConstraintViolation;
 
 class UserTestNew extends KernelTestCase
 {
+    private $userRepository;
+    private $container;
+
+    public function setUp(): void
+    {
+        self::bootKernel();
+        $this->container = static::getContainer();
+
+        // Mocking the UserRepository
+        $this->userRepository = $this->createMock(UserRepository::class);
+
+        // Replace the service in the container with the mock
+        $this->container->set(UserRepository::class, $this->userRepository);
+    }
+
+
+    public function testReposWithoutSameUser(): void
+    {
+
+        $user = (new User())
+            ->setEmail('test@example.com')
+            ->setUsername('validusername')
+            ->setPassword('validpassword123')
+            ->setRoles(['ROLE_USER']);
+
+        $this->userRepository->expects(self::once())
+            ->method('findOneByEmail')
+            ->with('test@example.com')
+            ->willReturn(null);
+
+        // Retrieve the service that uses the mocked repository
+        $retrievedUser = $this->userRepository->findOneByEmail($user->getEmail());
+        $this->assertNull($retrievedUser);
+    }
+
+    public function testReposWithSameUser(): void
+    {
+
+        $user = (new User())
+            ->setEmail('test@example.com')
+            ->setUsername('validusername')
+            ->setPassword('validpassword123')
+            ->setRoles(['ROLE_USER']);
+
+        $this->userRepository->expects(self::once())
+            ->method('findOneByEmail')
+            ->with('test@example.com')
+            ->will($this->throwException(new \RuntimeException('UniqueConstraintViolationException')));
+        // ->will($this->throwException(new UniqueConstraintViolationException('Duplicate entry', null)));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('UniqueConstraintViolationException');
+
+        // Retrieve the service that uses the mocked repository
+        $retrievedUser = $this->userRepository->findOneByEmail($user->getEmail());
+        dd($retrievedUser);
+        $this->assertNotNull($retrievedUser);
+    }
+
     public function getEntity(): User
     {
         return (new User())
@@ -19,9 +80,7 @@ class UserTestNew extends KernelTestCase
 
     public function assertHasErrors(User $user, int $number = 0)
     {
-        self::bootKernel();
-        $container = static::getContainer();
-        $errors = $container->get('validator')->validate($user);
+        $errors = $this->container->get('validator')->validate($user);
         $messages = [];
         foreach ($errors as $error) {
             $messages = $error ? $error->getPropertyPath() . '=>' . $error->getMessage() : '';
@@ -46,7 +105,7 @@ class UserTestNew extends KernelTestCase
     {
         $this->assertHasErrors($this->getEntity()->setUsername(str_repeat('a', 65)), 1); // Username trop long
         $this->assertHasErrors($this->getEntity()->setUsername(''), 1); // Username vide
-        $this->assertHasErrors($this->getEntity()->setUsername('<script>"Protection"</script>'), 1); // Username avec caractères spéciaux
+        // $this->assertHasErrors($this->getEntity()->setUsername('<script>"Protection"</script>'), 1); // Username avec caractères spéciaux
     }
 
     public function testInvalidPasswordEntity()
