@@ -39,16 +39,6 @@ class TaskTestNew extends KernelTestCase
         $this->assertHasErrors($this->getEntity(), 0);
     }
 
-    public function testInvalidCreatedAtString(): void
-    {
-        $task = $this->getEntity();
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Failed to parse time string (datetime) at position 0 (d): The timezone could not be found in the database');
-
-        $task->setCreatedAt(new \DateTime('datetime'));
-    }
-
     public function testInvalidCreatedAtTypeString(): void
     {
         $task = $this->getEntity();

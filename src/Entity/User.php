@@ -2,14 +2,18 @@
 
 namespace App\Entity;
 
+use App\EntityListener\UserListener;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'Il y a déja un compte avec cette email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -34,8 +38,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(length: 180, nullable: false)]
     #[Assert\NotBlank(message: "Un mot de passe est obligatoire")]
-    #[Assert\Length(min: 12, max: 180)]
+    #[Assert\Length(min: 12, max: 180, minMessage: "Un mot de passe avec min 12 caractère", maxMessage: "Un mot de passe avec min 180 caractère")]
     private ?string $password = null;
+
+    //Ici on ne met pas de ORM car nous ne voulons pas que le password soi envoyé en BDD
+    #[Assert\NotBlank(message: "Un mot de passe est obligatoire", groups: ["registration"])]
+    #[Assert\Length(min: 12, max: 180, minMessage: "Un mot de passe avec min 12 caractères", maxMessage: "Un mot de passe avec min 180 caractères", groups: ["registration"])]
+    private ?string $plainPassword = null;
 
     /**
      * @var list<string> The user roles
@@ -118,6 +127,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * Get plain password
+     */
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * Set plain password
+     */
+    public function setPlainPassword(?string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
 
     /**
      * @see UserInterface

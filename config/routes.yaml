@@ -1,5 +1,10 @@
 controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
-    type: attribute
+  resource:
+    path: ../src/Controller/
+    namespace: App\Controller
+  type: attribute
+
+# Force le chemin en cas de besoin pour certain navigateur
+index:
+  path: /
+  controller: App\Controller\RegistrationController::register

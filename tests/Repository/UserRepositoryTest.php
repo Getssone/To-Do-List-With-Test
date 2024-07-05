@@ -3,12 +3,11 @@
 namespace App\tests\Repository;
 
 use App\Entity\User;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserRepositoryTest extends KernelTestCase
 {
-    use FixturesTrait;
 
     public function testCount()
     {
