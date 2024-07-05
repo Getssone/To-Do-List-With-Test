@@ -30,18 +30,18 @@ class RegistrationController extends AbstractController
             foreach ($form->getErrors(true, true) as $error) {
                 $errors[] = $error->getMessage();
             }
-            dd($errors); // Debug form validation errors
+            dd($errors, $form); // Debug form validation errors
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
             dd('ok'); // Debug form validation errors
             // Encode the plain password
-            $plainPassword = $form->get('plainPassword')->getData();
-            $user->setPlainPassword($plainPassword);
-
             // $plainPassword = $form->get('plainPassword')->getData();
-            // $hashedPassword = $userPasswordHasher->hashPassword($user, $plainPassword);
-            // $user->setPassword($hashedPassword);
+            // $user->setPlainPassword($plainPassword);
+
+            $plainPassword = $form->get('plainPassword')->getData();
+            $hashedPassword = $userPasswordHasher->hashPassword($user, $plainPassword);
+            $user->setPassword($hashedPassword);
 
             // Persist the new user
             $entityManager->persist($user);
