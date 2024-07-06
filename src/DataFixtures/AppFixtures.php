@@ -22,7 +22,7 @@ class AppFixtures extends Fixture
         $user->setEmail('test@example.com');
         $user->setUsername('validusername');
         $user->setPlainPassword('validpassword123');
-        $user->setRoles(['ROLE_USER']);
+        $user->setRoles();
 
         $manager->persist($user);
         $manager->flush();

@@ -37,14 +37,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column(length: 180, nullable: false)]
-    #[Assert\NotBlank(message: "Un mot de passe est obligatoire")]
     #[Assert\Length(min: 12, max: 180, minMessage: "Un mot de passe avec min 12 caractère", maxMessage: "Un mot de passe avec min 180 caractère")]
     private ?string $password = null;
 
-    //Ici on ne met pas de ORM car nous ne voulons pas que le password soi envoyé en BDD
-    // #[Assert\NotBlank(message: "Un mot de passe est obligatoire", groups: ["registration"])]
-    // #[Assert\Length(min: 12, max: 180, minMessage: "Un mot de passe avec min 12 caractères", maxMessage: "Un mot de passe avec min 180 caractères", groups: ["registration"])]
-    // private ?string $plainPassword = null;
+    // Ici on ne met pas de ORM car nous ne voulons pas que le password soi envoyé en BDD
+    #[Assert\NotBlank(message: "Un mot de passe est obligatoire")]
+    #[Assert\Length(min: 12, max: 180, minMessage: "Un mot de passe avec min 12 caractères", maxMessage: "Un mot de passe avec min 180 caractères")]
+    private ?string $plainPassword = null;
 
     /**
      * @var list<string> The user roles
@@ -106,12 +105,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param list<string> $roles
      */
-    public function setRoles(array $roles): static
+    public function setRoles(?array $roles = []): static
     {
+        //La ligne de code vérifie la présence de 'ROLE_USER' dans le tableau $roles et l'ajoute si nécessaire, garantissant que chaque utilisateur a au moins le rôle 'ROLE_USER'. ATTENTION: Cela ne crée pas un nouveau tableau.
+
+        if (!in_array('ROLE_USER', $roles, true)) {
+            $roles[] = 'ROLE_USER';
+        }
+
         $this->roles = $roles;
 
         return $this;
     }
+
 
     /**
      * @see PasswordAuthenticatedUserInterface

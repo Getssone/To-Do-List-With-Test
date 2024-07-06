@@ -79,7 +79,7 @@ class DefaultControllerTest extends WebTestCase
     {
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $this->assertSelectorTextContains('.alert.alert-success .message', 'Bienvenu dans votre Todo List');
+        $this->assertSelectorTextContains('.alert.alert-success .message-success', 'Bienvenu dans votre Todo List');
     }
 
 

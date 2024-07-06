@@ -20,30 +20,16 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'constraints' => [
-                    new NotBlank(['message' => 'Please enter an email']),
-                    new Email(['message' => 'Please enter a valid email address']),
-                ],
+                'label' => 'Email',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('username', TextType::class, [
-                'constraints' => [
-                    new NotBlank(['message' => 'Please enter a username']),
-                    new Length([
-                        'min' => 3,
-                        'minMessage' => 'Your username should be at least {{ limit }} characters',
-                        'max' => 64,
-                    ]),
-                ],
+                'label' => 'Identifiant',
+                'attr' => ['class' => 'form-control']
             ])
-            ->add('password', PasswordType::class, [
-                'constraints' => [
-                    new NotBlank(['message' => 'Please enter a password']),
-                    new Length([
-                        'min' => 12,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        'max' => 180,
-                    ]),
-                ],
+            ->add('plainPassword', PasswordType::class, [
+                'label' => 'Mot de passe',
+                'attr' => ['class' => 'form-control']
             ])
             ->add('register', SubmitType::class, [
                 'label' => 'Inscription',

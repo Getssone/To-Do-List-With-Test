@@ -26,7 +26,7 @@
 			<div class="container">
 				<div class="d-flex flex-row flex-wrap navbar-header justify-content-around w-100">
 					<a class="navbar-brand" href="#">To Do List app</a>
-					{% if not app.user and ('register' or '/' ) != app.request.attributes.get('_route') %}
+					{% if not app.user and ('register' or 'index') != app.request.attributes.get('_route') %}
 						<a href='/register' class="register btn btn-outline-secondary">Créer un utilisateur</a>
 					{% endif %}
 
@@ -50,7 +50,7 @@
 					{% for flash_message in app.session.flashBag.get('success') %}
 						<div class="alert alert-success alert-dismissible fade show" role="alert">
 							<strong>Superbe !</strong>
-							<p class="message">
+							<p class="message-success">
 								{{ flash_message }}
 							</p>
 							<button type="button " class="btn-close btn btn-success" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -60,7 +60,7 @@
 					{% for flash_message in app.session.flashBag.get('error') %}
 						<div class="alert alert-danger alert-dismissible fade show" role="alert">
 							<strong>Oops !</strong>
-							<p>
+							<p class="message-danger">
 								{{ flash_message }}
 							</p>
 							<button type="button " class="btn-close btn btn-danger" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -74,7 +74,7 @@
 			<br/>
 
 			<div class="row">
-				<div class="col-md-12"> {% block body %}{% endblock %}
+				<div class="col-md-12 d-flex flex-column align-items-center"> {% block body %}{% endblock %}
 					</div>
 				</div>
 			</div>
