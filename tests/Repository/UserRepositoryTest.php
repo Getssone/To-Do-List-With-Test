@@ -13,13 +13,12 @@ class UserRepositoryTest extends KernelTestCase
     {
         $kernel = self::bootKernel();
         $entityManager = $kernel->getContainer()->get('doctrine')->getManager();
-        $users = $entityManager->getRepository(UserRepository::class);
         $usersCount = $entityManager->createQueryBuilder()
             ->select('COUNT(u.id)')
             ->from(User::class, 'u')
             ->getQuery()
             ->getSingleScalarResult();
 
-        $this->assertEquals(10, $usersCount);
+        $this->assertEquals(11, $usersCount);
     }
 }

@@ -1,16 +1,20 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Tests;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManager;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class SecurityControllerTest extends WebTestCase
 {
     private  $client;
     private  $urlGenerator;
     private  $container;
-    // private $userRepository;
     private $crawler;
 
     public function setUp(): void
@@ -18,51 +22,73 @@ class SecurityControllerTest extends WebTestCase
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
         $this->urlGenerator = $this->container->get('router');
-        // $this->userRepository = $this->container->get(UserRepository::class);
-        $this->crawler = $this->client->request('GET', $this->urlGenerator->generate('login'));
+        $this->crawler = $this->client->request('GET', $this->getPath('login'));
     }
 
-    // Connexion
-    // public function testLinkConnexionIfLoggedOut()
-    // {
-    //     $this->assertSelectorExists("a[href='/register']");
-    //     $this->assertSelectorNotExists("a[href='/login']");
-    //     $this->assertSelectorNotExists("a[href='/logout']");
-    // }
-    // public function testIfLoginIsSuccessfull(): void
-    // {
-    //     $form = $this->crawler->filter("form[name=login]")->form([
-    //         "email" => 'test@example.com',
-    //         "password" => 'validpassword123'
-    //     ]);
-    //     $this->client->submit($form);
-    //     $this->assertResponseIsSuccessful();
-    //     $this->assertRouteSame('homepage');
-    //     // $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
-    //     // // Vérifiez que la soumission du formulaire a redirigé l'utilisateur vers la page attendue
-    // }
 
-    public function testIfLoginIsSuccessfullWithForm(): void
+    public function getPath($url): string
     {
-        $form = $this->crawler->filter("form[name=login_form]")->form([
-            "login_form[email]" => 'test@example.com',
-            "login_form[password]" => 'validpassword123'
-        ]);
-        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        // $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
-        $this->client->followRedirect();
-        dd($this->crawler);
-        $this->assertRouteSame('homepage');
+        return  $this->urlGenerator->generate($url);
     }
-    // public function testIfLoginFailedWhenPasswordIsWrong(): void
-    // {
-    //     $form = $this->crawler->filter("form[name=login]")->form([
-    //         "_username" => '@example',
-    //         "_password" => 'tt'
-    //     ]);
-    //     $this->client->submit($form);
-    //     $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
-    //     $this->assertRouteSame('login');
-    //     $this->assertSelectorTextContains('div.alert.alert-danger.alert-dismissible.fade.show', 'Oops!');
-    // }
+
+    public function testShowLoginForm()
+    {
+        $this->assertResponseIsSuccessful();
+        $this->assertPageTitleContains('Connexion');
+    }
+
+    public function testLoginWithBadEmail(): void
+    {
+        $this->assertResponseIsSuccessful();
+
+        $form = $this->crawler->filter('form[name=login]')->form([
+            '_username' => 'doesNotExist',
+            '_password' => 'validpassword123',
+        ]);
+
+        $this->client->submit($form);
+
+        //Mise a jour du visuel Crawler
+        $this->crawler = $this->client->getCrawler();
+        $this->assertResponseRedirects('/login', 302);
+        $this->client->followRedirect();
+
+        $this->assertSelectorExists('.alert.alert-danger', 'Identifiants invalides.');
+    }
+    public function testLoginWithBadPassword(): void
+    {
+        $this->assertResponseIsSuccessful();
+
+        $form = $this->crawler->selectButton('Connexion')->form([
+            '_username' => 'test@example.com',
+            '_password' => 'w',
+        ]);
+
+        $this->client->submit($form);
+
+        //Mise a jour du visuel Crawler
+        $this->crawler = $this->client->getCrawler();
+        $this->assertResponseRedirects('/login', 302);
+        $this->client->followRedirect();
+        $this->assertSelectorExists('.alert.alert-danger', 'Identifiants invalides.');
+    }
+
+    public function testLoginValid(): void
+    {
+        // Assurez-vous que la page de connexion est chargée
+        $this->assertResponseIsSuccessful();
+        $this->assertPageTitleContains('Connexion');
+
+        $form = $this->crawler->selectButton('Connexion')->form([
+            '_username' => 'test@example.com',
+            '_password' => 'validpassword123'
+        ]);
+
+        $this->client->submit($form);
+        $this->assertResponseRedirects($this->getPath('homepage'), Response::HTTP_FOUND);
+        $this->client->followRedirect();
+
+        $this->assertRouteSame('homepage');
+        $this->assertResponseIsSuccessful();
+    }
 }

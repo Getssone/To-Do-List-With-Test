@@ -25,18 +25,17 @@
 		<nav class="navbar bg-dark navbar-dark navbar-fixed-top flex-nowrap" role="navigation">
 			<div class="container">
 				<div class="d-flex flex-row flex-wrap navbar-header justify-content-around w-100">
-					<a class="navbar-brand" href="#">To Do List app</a>
-					{% if not app.user and ('register' or 'index') != app.request.attributes.get('_route') %}
+					<a class="navbar-brand" href="/#">To Do List app</a>
+					{% if not app.user and ('register' is not same as(app.request.attributes.get('_route')) and 'index' is not same as(app.request.attributes.get('_route'))) %}
 						<a href='/register' class="register btn btn-outline-secondary">Créer un utilisateur</a>
 					{% endif %}
-
 					{% if app.user %}
 						<a href="/logout" class="userLogout pull-right btn-outline-secondary">Se déconnecter</a>
 					{% endif %}
 
-					{% if not app.user and 'security.login' != app.request.attributes.get('_route') %}
+					{% if not app.user and 'login' != app.request.attributes.get('_route') %}
 
-						<a href={{ path('security.login') }} class="userLogin btn btn-outline-secondary">Se connecter</a>
+						<a href={{ path('login') }} class="userLogin btn btn-outline-secondary">Se connecter</a>
 					{% endif %}
 				</div>
 			</div>
@@ -49,7 +48,7 @@
 					<img class="todoListIcon" src="{{ asset('img/todolist_homepage.png') }}" alt="todo list">
 					{% for flash_message in app.session.flashBag.get('success') %}
 						<div class="alert alert-success alert-dismissible fade show" role="alert">
-							<strong>Superbe !</strong>
+							<strong class="message-title">Superbe !</strong>
 							<p class="message-success">
 								{{ flash_message }}
 							</p>
@@ -59,7 +58,7 @@
 
 					{% for flash_message in app.session.flashBag.get('error') %}
 						<div class="alert alert-danger alert-dismissible fade show" role="alert">
-							<strong>Oops !</strong>
+							<strong class="message-title">Oops !</strong>
 							<p class="message-danger">
 								{{ flash_message }}
 							</p>

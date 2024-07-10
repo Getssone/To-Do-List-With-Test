@@ -2,6 +2,8 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -11,7 +13,7 @@ class RegistrationControllerTest extends WebTestCase
     private  $client;
     private  $urlGenerator;
     private  $container;
-    // private $userRepository;
+    private UserRepository $userRepository;
     private $crawler;
 
     public function setUp(): void
@@ -19,9 +21,10 @@ class RegistrationControllerTest extends WebTestCase
         $this->client = static::createClient();
         $this->container = $this->client->getContainer();
         $this->urlGenerator = $this->container->get('router');
-        // $this->userRepository = $this->container->get(UserRepository::class);
         $this->crawler = $this->client->request('GET', $this->getPath('register'));
+        $this->userRepository = $this->container->get(UserRepository::class);
     }
+
 
     public function getPath($url): string
     {
@@ -32,7 +35,7 @@ class RegistrationControllerTest extends WebTestCase
     public function testShowRegisterForm()
     {
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Register');
+        $this->assertSelectorTextContains('h1', 'Inscription');
     }
 
     public function testSubmitRegisterFormWithInvalidData()
@@ -53,19 +56,21 @@ class RegistrationControllerTest extends WebTestCase
         $this->assertSelectorExists('.alert-danger');
     }
 
-    public function testSubmitRegisterFormWithValidData()
+    public function testSaveNewUser(): void
     {
+        $this->assertResponseIsSuccessful();
+        $this->assertPageTitleContains('Inscription');
+
         $form = $this->crawler->selectButton('Inscription')->form([
-            'registration_form[email]' => 'testy@example.com',
-            'registration_form[username]' => 'testyuser',
+            'registration_form[email]' => 'testToto@example.com',
+            'registration_form[username]' => 'testToto',
             'registration_form[plainPassword]' => 'validpassword123'
         ]);
-
         $this->client->submit($form);
-
         $this->assertResponseRedirects($this->getPath('homepage'));
-
         $this->client->followRedirect();
-        $this->assertSelectorTextContains('.alert.alert-success .message-success', 'Bienvenu dans votre Todo List');
+
+        $savedUser = $this->userRepository->findOneByEmail('testToto@example.com');
+        $this->assertNotNull($savedUser, 'User should be saved in the database');
     }
 }

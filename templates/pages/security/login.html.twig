@@ -4,117 +4,113 @@
 {% block title %}Connexion
 {% endblock %}
 {% block body %}
-	<style>
-		.example-wrapper {
-			margin: 1em auto;
-			max-width: 800px;
-			width: 95%;
-			font: 18px / 1.5 sans-serif;
-		}
-		.example-wrapper code {
-			background: #F5F5F5;
-			padding: 2px 6px;
-		}
-	</style>
 
 	<div class="flex justify-center items-center flex-wrap h-full g-6 text-gray-800 m-24">
 		<div class="grow-0 shrink-1 md:shrink-0 basis-auto xl:w-6/12 lg:w-6/12 md:w-9/12 mb-12 md:mb-0"></div>
-		{# <form name="login" action="{{ path('security.login') }}" method="post"> #}
 		<div class="d-flex justify-content-center gap-3 flex-wrap flex-md-nowrap">
-			<form name="login" action="{{ path('security.login')}} method=" post" class=" w-50 p-4 border rounded shadow-sm">
-				<h2 class="text-center mb-4">Login</h2>
 
-				<!-- Email input -->
-				<div class="form-group mb-3">
-					<label for="email" class="form-label">Adresse email</label>
-					<input type="email" id="email" name="email" value="{{ last_username }}" class="form-control" placeholder="Adresse email" required>
+			{% if app.user %}
+				<div class=" w-50 p-4 border rounded shadow-sm">
+					<div class="mb-3">
+						Vous êtes connecté en tant que
+						{{ app.user.userIdentifier }}
+						<a class="homepage btn btn-success" href="/homepage">Page d'accueil</a>
+					</div>
 				</div>
+			{% endif %}
 
-				<!-- Password input -->
-				<div class="form-group mb-3">
-					<label for="password" class="form-label">Mot de passe</label>
-					<input type="password" id="password" name="password" class="form-control" placeholder="Mot de passe" required>
-				</div>
+			{% if not app.user %}
+				<form name="login" action="{{ path('login') }}" method="post" class=" w-50 p-4 border rounded shadow-sm">
+					<h2 class="text-center mb-4">Connexion</h2>
+					{% if error %}
+						<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+					{% endif %}
 
-				<input
-				type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-				<!-- Submit button -->
-				<button type="submit" class="btn btn-primary w-100">Connexion</button>
-			</form>
+					<label for="username">Email</label>
+					<input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="email" placeholder="Adresse email" required autofocus>
+					<label for="password">Mot de passe</label>
+					<input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+					<button type="submit" class="btn btn-primary w-100">Connexion</button>
+				</form>
+
+			{% endif %}
+			{# <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"> #}
 
 			<div name="ToDoList" class="w-50 p-4 border border-1 rounded shadow bg-warning bg-gradient bg-opacity-25 ">
 				<h2 class="text-center mb-4">
-					<u>Your Futur
-						<p>
-							To Do List
-						</p>
-						<u></h2>
+					<u>Your Future
+						<p>To Do List<p/></p>
+					</u>
+				</h2>
 
-						<ul
-							class="list-group mb-4">
-							<!-- 1er chose Checbox -->
-							<li class="list-group-item d-flex justify-content-between align-items-center">
-								<div class="form-check">
-									<input type="checkbox" class="form-check-input" id="task1">
-									<label class="form-check-label" for="task1">1er chose</label>
-								</div>
-								<button class="btn btn-danger btn-sm">
-									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
-										<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
-									</svg>
-								</button>
-							</li>
-							<!-- 2nd chose Checbox -->
-							<li class="list-group-item d-flex justify-content-between align-items-center">
-								<div class="form-check">
-									<input type="checkbox" class="form-check-input" id="task2">
-									<label class="form-check-label" for="task2">2nd chose</label>
-								</div>
-								<button class="btn btn-danger btn-sm">
-									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
-										<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
-									</svg>
-								</button>
-							</li>
-							<!-- 3eme chose Checbox -->
-							<li class="list-group-item d-flex justify-content-between align-items-center">
-								<div class="form-check">
-									<input type="checkbox" class="form-check-input" id="task3">
-									<label class="form-check-label" for="task3">3eme chose</label>
-								</div>
-								<button class="btn btn-danger btn-sm">
-									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
-										<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
-									</svg>
-								</button>
-							</li>
-							<!-- 4eme chose Checbox -->
-							<li class="list-group-item d-flex justify-content-between align-items-center">
-								<div class="form-check">
-									<input type="checkbox" class="form-check-input" id="task4">
-									<label class="form-check-label" for="task4">4eme chose</label>
-								</div>
-								<button class="btn btn-danger btn-sm">
-									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
-										<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
-									</svg>
-								</button>
-							</li>
-						</ul>
-
-						<div id="addTaskFakeForm">
-							<div class="input-group mb-3">
-								<input type="text" class="form-control" placeholder="Nouvelle tâche" id="newTaskInput">
-								<button class="btn btn-primary" type="submit">
-									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewbox="0 0 16 16">
-										<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-										<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-									</svg>
-								</button>
-							</div>
+				<ul
+					class="list-group mb-4">
+					<!-- 1er chose Checbox -->
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="task1">
+							<label class="form-check-label" for="task1">1er chose</label>
 						</div>
+						<button class="btn btn-danger btn-sm">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
+								<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+							</svg>
+						</button>
+					</li>
+					<!-- 2nd chose Checbox -->
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="task2">
+							<label class="form-check-label" for="task2">2nd chose</label>
+						</div>
+						<button class="btn btn-danger btn-sm">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
+								<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+							</svg>
+						</button>
+					</li>
+					<!-- 3eme chose Checbox -->
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="task3">
+							<label class="form-check-label" for="task3">3eme chose</label>
+						</div>
+						<button class="btn btn-danger btn-sm">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
+								<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+							</svg>
+						</button>
+					</li>
+					<!-- 4eme chose Checbox -->
+					<li class="list-group-item d-flex justify-content-between align-items-center">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="task4">
+							<label class="form-check-label" for="task4">4eme chose</label>
+						</div>
+						<button class="btn btn-danger btn-sm">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewbox="0 0 16 16">
+								<path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+							</svg>
+						</button>
+					</li>
+				</ul>
+
+				<div id="addTaskFakeForm">
+					<div class="input-group mb-3">
+						<input type="text" class="form-control" placeholder="Nouvelle tâche" id="newTaskInput">
+						<button class="btn btn-primary" type="submit">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle" viewbox="0 0 16 16">
+								<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
+							</svg>
+						</button>
 					</div>
 				</div>
 			</div>
-		{% endblock %}
+		</div>
+	</div>
+{% endblock %}
