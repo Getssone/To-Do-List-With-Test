@@ -249,23 +249,6 @@ class TaskTest extends KernelTestCase
             $this->expectException(InvalidArgumentException::class);
             $this->expectExceptionMessage("La valeur de 'isDone' doit être un booléen.");
         }
-
-        // if ($isDoneTest === true) {
-        //     $this->assertNotEmpty($isDoneTest, "cette variable ne devrait pas être vide");
-        //     $this->assertNotNull($isDoneTest, "cette variable ne devrait pas être null");
-        //     $this->assertIsNotString($isDoneTest, "cette variable ne devrait pas être une string");
-        //     $this->assertIsBool($isDoneTest, "cette variable devrait être une boolean");
-        //     $this->assertFalse(!is_bool($isDoneTest), "cette variable ne devrait pas être rara");
-        // }
-        // $this->assertEquals($isDoneTest, $task->getIsDone(), "Le contenu devrait être égal à celui défini");
-        // $this->assertOnl
-        // if (!is_bool($isDoneTest)) {
-        //     throw new \InvalidArgumentException("La valeur doit être un booléen.");
-        // }
-        // $this->assertNotNull($isDoneTest, "Cette variable devrait être un booléen (vrai ou faux)");
-        // $this->assertIsNotString($isDoneTest, "Cette variable devrait être un booléen (vrai ou faux)");
-        // $this->assertIsBool($isDoneTest, "Cette variable devrait être un booléen (vrai ou faux)");
-        // $this->assertSame($isDoneTest, $task->getIsDone(), "Le contenu devrait être égal à celui défini");
     }
 
     /**

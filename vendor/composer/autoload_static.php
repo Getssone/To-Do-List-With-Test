@@ -135,6 +135,10 @@ class ComposerStaticInitabab989af4fef9ea3032de569a28a37c
         array (
             'Liip\\TestFixturesBundle\\' => 24,
         ),
+        'F' => 
+        array (
+            'Faker\\' => 6,
+        ),
         'E' => 
         array (
             'Egulias\\EmailValidator\\' => 23,
@@ -517,6 +521,10 @@ class ComposerStaticInitabab989af4fef9ea3032de569a28a37c
         'Liip\\TestFixturesBundle\\' => 
         array (
             0 => __DIR__ . '/..' . '/liip/test-fixtures-bundle/src',
+        ),
+        'Faker\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/fakerphp/faker/src/Faker',
         ),
         'Egulias\\EmailValidator\\' => 
         array (

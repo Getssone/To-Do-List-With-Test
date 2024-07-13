@@ -11,8 +11,6 @@ use Symfony\Component\ErrorHandler\Error\UndefinedMethodError;
 class UserTest extends KernelTestCase
 {
 
-    // Revoir : https://www.youtube.com/watch?v=fMiB8iVxhfw a 6:15
-
     public function getEntity($usernameTest, $email, $password)
     {
         $user = new User();

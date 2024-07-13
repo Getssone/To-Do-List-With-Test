@@ -7,4 +7,4 @@ controllers:
 # Force le chemin en cas de besoin pour certain navigateur
 index:
   path: /
-  controller: App\Controller\RegistrationController::register
+  controller: App\Controller\DefaultController::homepage

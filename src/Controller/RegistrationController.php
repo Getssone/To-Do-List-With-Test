@@ -49,9 +49,9 @@ class RegistrationController extends AbstractController
         }
 
         // Ajoutez un message flash de test ici
-        $this->addFlash('info', 'Formulaire chargé correctement');
+        $this->addFlash('success', 'Formulaire chargé correctement');
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render('pages/registration/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
     }

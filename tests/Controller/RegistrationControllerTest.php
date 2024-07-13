@@ -70,6 +70,8 @@ class RegistrationControllerTest extends WebTestCase
         $this->assertResponseRedirects($this->getPath('homepage'));
         $this->client->followRedirect();
 
+
+
         $savedUser = $this->userRepository->findOneByEmail('testToto@example.com');
         $this->assertNotNull($savedUser, 'User should be saved in the database');
     }

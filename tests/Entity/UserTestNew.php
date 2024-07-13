@@ -58,7 +58,6 @@ class UserTestNew extends KernelTestCase
             ->method('findOneByEmail')
             ->with('test@example.com')
             ->will($this->throwException(new \RuntimeException('UniqueConstraintViolationException')));
-        // ->will($this->throwException(new UniqueConstraintViolationException('Duplicate entry', null)));
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('UniqueConstraintViolationException');
