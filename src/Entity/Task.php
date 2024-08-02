@@ -2,14 +2,17 @@
 
 namespace App\Entity;
 
+use App\EntityListener\TaskListener;
 use App\Repository\TaskRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
+// #[ORM\EntityListeners([TaskListener::class])]
 class Task
 {
     #[ORM\Id]
@@ -33,6 +36,10 @@ class Task
 
     #[ORM\Column(nullable: false)]
     private bool $isDone = false;
+
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -101,4 +108,16 @@ class Task
 
     //enlèvement de la function toggle($flag) car redondant avec la function setDone($isDone) 
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+
+        return $this;
+    }
 }

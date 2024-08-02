@@ -2,13 +2,14 @@
 
 namespace App\Tests\Entity;
 
+use App\Entity\Task;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class UserTestNew extends KernelTestCase
+class UserEntityTest extends KernelTestCase
 {
     private $userRepository;
     private $container;
@@ -64,16 +65,15 @@ class UserTestNew extends KernelTestCase
 
         // Retrieve the service that uses the mocked repository
         $retrievedUser = $this->userRepository->findOneByEmail($user->getEmail());
-        dd($retrievedUser);
         $this->assertNotNull($retrievedUser);
     }
 
     public function getEntity(): User
     {
         return (new User())
-            ->setEmail('test@example.com')
-            ->setUsername('validusername')
-            ->setPassword('validpassword123')
+            ->setEmail('testNoExistant@example.com')
+            ->setUsername('NoExistant')
+            ->setPlainPassword('validpassword123')
             ->setRoles(['ROLE_USER']);
     }
 
@@ -109,13 +109,49 @@ class UserTestNew extends KernelTestCase
 
     public function testInvalidPasswordEntity()
     {
-        $this->assertHasErrors($this->getEntity()->setPassword(''), 2); // Mot de passe vide et court
-        $this->assertHasErrors($this->getEntity()->setPassword('short'), 1); // Mot de passe trop court
-        $this->assertHasErrors($this->getEntity()->setPassword(str_repeat('a', 181)), 1); // Mot de passe trop long
+        $this->assertHasErrors($this->getEntity()->setPlainPassword(''), 2); // Mot de passe vide et court
+        $this->assertHasErrors($this->getEntity()->setPlainPassword('short'), 1); // Mot de passe trop court
+        $this->assertHasErrors($this->getEntity()->setPlainPassword(str_repeat('a', 181)), 1); // Mot de passe trop long
     }
 
     public function testInvalidRolesEntity()
     {
         $this->assertHasErrors($this->getEntity()->setRoles([]), 0); // Pas d'erreur attendu car ROLE_USER est ajouté par défaut
+    }
+    public function testGetTasksOfUser()
+    {
+        $user = new User();
+        $task1 = (new Task())->setTitle('Title Task1')->setContent('Content Task1');
+        $task2 = (new Task())->setTitle('Title Task2')->setContent('Content Task2');
+        $user->addTask($task1);
+        $user->addTask($task2);
+
+        $tasks = $user->getTasks();
+
+        $this->assertCount(2, $tasks);
+        $this->assertTrue($tasks->contains($task1));
+        $this->assertTrue($tasks->contains($task2));
+    }
+
+    public function testAddTaskAndSeeUser()
+    {
+        $user = $this->getEntity();
+        $task = (new Task())->setTitle('Title Task')->setContent('Content Task');
+        $user->addTask($task);
+
+        $this->assertCount(1, $user->getTasks());
+        $this->assertTrue($user->getTasks()->contains($task));
+        $this->assertSame($user, $task->getUser());
+    }
+
+    public function testRemoveTaskOfUser()
+    {
+        $user = $this->getEntity();
+        $task = (new Task())->setTitle('Title Task')->setContent('Content Task');
+        $user->addTask($task);
+        $user->removeTask($task);
+
+        $this->assertCount(0, $user->getTasks());
+        $this->assertNull($task->getUser());
     }
 }

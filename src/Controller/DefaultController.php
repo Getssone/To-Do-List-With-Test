@@ -20,6 +20,10 @@ class DefaultController extends AbstractController
             'controller_name' => 'HomePage',
         ]);
     }
+
+    /**
+     * @codeCoverageIgnore
+     */
     #[Route('/homepage-old', name: 'homepage-old')]
     public function homepageOld(): Response
     {

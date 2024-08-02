@@ -3,6 +3,7 @@
 namespace App\Tests\Entity;
 
 use App\Entity\Task;
+use App\Entity\User;
 use DateTime;
 use Exception;
 use RuntimeException;
@@ -10,7 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use TypeError;
 
-class TaskTestNew extends KernelTestCase
+class TaskEntityTest extends KernelTestCase
 {
     public function getEntity(): Task
     {
@@ -58,6 +59,35 @@ class TaskTestNew extends KernelTestCase
 
         $task->setCreatedAt(null);
     }
+    public function testValidGetCreatedAt(): void
+    {
+        $task = $this->getEntity();
+        $task->setCreatedAt(new DateTime());
+        $this->assertInstanceOf(DateTime::class, $task->getCreatedAt());
+    }
+    public function testGetCreatedAt()
+    {
+        $entity =  $this->getEntity();
+        $createdAt = new DateTime();
+        $entity->setCreatedAt($createdAt);
+
+        $this->assertEquals($createdAt, $entity->getCreatedAt());
+    }
+
+    public function testSetCreatedAt()
+    {
+        $entity =  $this->getEntity();
+        $createdAt = new DateTime();
+        $entity->setCreatedAt($createdAt);
+
+        $this->assertEquals($createdAt, $entity->getCreatedAt());
+
+        $newCreatedAt = new DateTime();
+        $entity->setCreatedAt($newCreatedAt);
+
+        $this->assertEquals($newCreatedAt, $entity->getCreatedAt());
+    }
+
 
     public function testInvalidTitleEntity()
     {
@@ -99,5 +129,48 @@ class TaskTestNew extends KernelTestCase
     {
         $this->assertHasErrors($this->getEntity()->setIsDone(true), 0);
         $this->assertHasErrors($this->getEntity()->setIsDone(false), 0);
+    }
+    public function testGetUser()
+    {
+        $user = (new User())
+            ->setEmail('test@example.com')
+            ->setUsername('validusername')
+            ->setPassword('validpassword123')
+            ->setRoles(['ROLE_USER']);
+        $task = $this->getEntity();
+        $task->setUser($user);
+
+        $this->assertSame($user, $task->getUser());
+    }
+
+    public function testSetUser()
+    {
+        $user = (new User())
+            ->setEmail('test@example.com')
+            ->setUsername('validusername')
+            ->setPassword('validpassword123')
+            ->setRoles(['ROLE_USER']);
+        $task = $this->getEntity();
+        $task->setUser($user);
+
+        $this->assertSame($user, $task->getUser());
+        $newUser = (new User())
+            ->setEmail('test2@example.com')
+            ->setUsername('validusername2')
+            ->setPassword('validpassword123')
+            ->setRoles(['ROLE_USER']);
+
+        $task->setUser($newUser);
+
+        $this->assertSame($newUser, $task->getUser());
+    }
+
+    public function testSetUserWithNull()
+    {
+        $task = $this->getEntity();
+
+        $task->setUser(null);
+
+        $this->assertNull($task->getUser());
     }
 }

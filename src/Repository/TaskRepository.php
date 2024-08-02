@@ -16,6 +16,22 @@ class TaskRepository extends ServiceEntityRepository
         parent::__construct($registry, Task::class);
     }
 
+    /**
+     * @return Task[] Returns an array of Task objects
+     */
+    public function findByStatus(bool $isDone): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.isDone = :val')
+            ->setParameter('val', $isDone)
+            ->orderBy('t.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+    public function findAllDESC(): array
+    {
+        return $this->findBy([], ['createdAt' => 'DESC']);
+    }
     //    /**
     //     * @return Task[] Returns an array of Task objects
     //     */

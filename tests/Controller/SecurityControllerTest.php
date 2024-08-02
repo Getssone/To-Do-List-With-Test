@@ -91,4 +91,19 @@ class SecurityControllerTest extends WebTestCase
         $this->assertRouteSame('homepage');
         $this->assertResponseIsSuccessful();
     }
+    public function testLogout()
+    {
+        $client = $this->client;
+
+        $userRepository = $this->container->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('test@example.com');
+
+        $this->assertNotNull($testUser, 'L\'utilisateur doit être présent dans la base de données.');
+
+        $this->client->loginUser($testUser);
+
+        // make a GET request to the logout route
+        $this->client->request('GET', $this->getPath('logout'));
+        $this->assertResponseRedirects('/homepage');
+    }
 }

@@ -1,22 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Inscription
+{% block title %}Créer un utilisateur
 {% endblock %}
 
 {% block body %}
-	<h1>Inscription</h1>
+	<h1>Créer un utilisateur</h1>
 
-	{{ form_start(registrationForm,{'attr': {'class': 'd-flex flex-column justify-content-center align-content-center w-50 p-4 border rounded shadow-sm'}}) }}
+	{{ include('user/_form.html.twig') }}
 
-	<div class="form-group mb-3">
-		{{ form_row(registrationForm.email) }}
-	</div>
-	<div class="form-group mb-3">
-		{{ form_row(registrationForm.username) }}
-	</div>
-	<div class="form-group mb-3">
-		{{ form_row(registrationForm.plainPassword) }}
-	</div>
-	{{ form_end(registrationForm) }}
-
+	<a href="{{ path('list.user') }}">Retour à la list des utilisateurs</a>
 {% endblock %}

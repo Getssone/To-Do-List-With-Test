@@ -30,7 +30,50 @@ class RegistrationController extends AbstractController
                 // Utilisation de dd pour afficher les erreurs de validation
                 $this->addFlash('error', $error->getMessage());
             }
-            return $this->redirectToRoute('register');
+        }
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $plainPassword = $form->get('plainPassword')->getData();
+            $user->setPlainPassword($plainPassword);
+            $role = $form->get('roles')->getData();
+            if ($role === 'ROLE_USER') {
+                $user->setRoles();
+            } elseif ($role === 'ROLE_ADMIN') {
+                $user->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
+            };
+
+            // Persist the new user
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            // Authenticate the user
+            //Ici 1er @param l'entité User pour dire qui sera "authentifier" 2nd @param $authenticatorName  qu'on retrouve dans security Yaml 3eme @param $firewallName pour indiquer sur quel firewall ont souhaite vérifier et configurer la connexion
+            return $security->login($user, 'form_login', 'main');
+        }
+
+        // Ajoutez un message flash de test ici
+        $this->addFlash('success', 'Formulaire chargé correctement');
+
+        return $this->render('pages/registration/register.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    #[Route('/register-old', name: 'register-old')]
+    public function registerOld(Request $request, Security $security, EntityManagerInterface $entityManager): Response
+    {
+        $user = new User();
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && !$form->isValid()) {
+            foreach ($form->getErrors(true, true) as $error) {
+                // Utilisation de dd pour afficher les erreurs de validation
+                $this->addFlash('error', $error->getMessage());
+            }
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -51,8 +94,8 @@ class RegistrationController extends AbstractController
         // Ajoutez un message flash de test ici
         $this->addFlash('success', 'Formulaire chargé correctement');
 
-        return $this->render('pages/registration/register.html.twig', [
-            'registrationForm' => $form->createView(),
+        return $this->render('pages/registration/register-old.html.twig', [
+            'form' => $form,
         ]);
     }
 }

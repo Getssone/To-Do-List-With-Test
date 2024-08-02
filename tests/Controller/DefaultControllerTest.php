@@ -144,13 +144,13 @@ class DefaultControllerTest extends WebTestCase
         $this->assertPageTitleContains('Welcome To Do List !');
 
         $linkNewTasks = $this->getLinkClass('newTasks');
-        $this->assertSame('http://localhost/#', $linkNewTasks);
+        $this->assertSame('http://localhost/new-task', $linkNewTasks);
 
         $linkToDoTasks = $this->getLinkClass('toDoTasks');
-        $this->assertSame('http://localhost/#', $linkToDoTasks);
+        $this->assertSame('http://localhost/list-task?q=notDone', $linkToDoTasks);
 
         $linkCompletedTasks = $this->getLinkClass('completedTasks');
-        $this->assertSame('http://localhost/#', $linkCompletedTasks);
+        $this->assertSame('http://localhost/list-task?q=done', $linkCompletedTasks);
     }
 
     // Déconnecté

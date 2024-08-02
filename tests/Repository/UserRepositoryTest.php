@@ -3,7 +3,6 @@
 namespace App\tests\Repository;
 
 use App\Entity\User;
-use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class UserRepositoryTest extends KernelTestCase
@@ -19,6 +18,14 @@ class UserRepositoryTest extends KernelTestCase
             ->getQuery()
             ->getSingleScalarResult();
 
-        $this->assertEquals(11, $usersCount);
+        $this->assertEquals(12, $usersCount);
+    }
+    public function testFindAllDESC()
+    {
+        $kernel = self::bootKernel();
+        $entityManager = $kernel->getContainer()->get('doctrine')->getManager();
+        $repository = $entityManager->getRepository(User::class);
+        $users = $repository->findAllDESC();
+        $this->assertCount(12, $users);
     }
 }

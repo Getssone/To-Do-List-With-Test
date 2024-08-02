@@ -11,14 +11,17 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @codeCoverageIgnore
+ */
 class TaskFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('createdAt', DateType::class, [
-                'label' => 'Crée le'
-            ])
+            // ->add('createdAt', DateType::class, [
+            //     'label' => 'Crée le'
+            // ])
             ->add('title', TextType::class, [
                 'label' => 'Titre'
             ])
