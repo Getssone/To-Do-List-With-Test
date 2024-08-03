@@ -35,15 +35,34 @@ class RegisterControllerTest extends WebTestCase
         return $url;
     }
 
+    public function isConnected(): ?User
+    {
+        $userRepository = $this->container->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('test@example.com');
+        if ($testUser) {
+            $this->client->loginUser($testUser);
+            return $testUser;
+        }
+        return false;
+    }
 
+    public function testNoAdmin()
+    {
+        $this->assertResponseRedirects($this->getPath('login'));
+    }
     public function testShowRegisterForm()
     {
+        $this->isConnected();
+        $this->crawler = $this->client->request('GET', $this->getPath('register'));
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Créer un utilisateur');
     }
 
     public function testSubmitRegisterFormWithInvalidData()
     {
+
+        $this->isConnected();
+        $this->crawler = $this->client->request('GET', $this->getPath('register'));
         $form = $this->crawler->selectButton('Ajouter')->form([
             'registration_form[email]' => 'invalid-email',
             'registration_form[username]' => '',
@@ -58,6 +77,9 @@ class RegisterControllerTest extends WebTestCase
 
     public function testSaveNewUser(): void
     {
+
+        $this->isConnected();
+        $this->crawler = $this->client->request('GET', $this->getPath('register'));
         $this->assertResponseIsSuccessful();
         $this->assertPageTitleContains('Créer un utilisateur');
 

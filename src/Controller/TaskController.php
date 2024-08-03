@@ -221,13 +221,21 @@ class TaskController extends AbstractController
     }
 
     #[Route('/{id}/deleted', name: 'deleted.task', methods: ['POST'])]
-    public function delete(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, #[CurrentUser()] ?User $user, Task $task, EntityManagerInterface $entityManager): Response
     {
+        if (in_array("ROLE_ADMIN", $user->getRoles()) && $task->getUser()->getUsername() === "anonyme") {
+            $this->addFlash('success', 'Task supprimé correctement');
+            return $this->redirectToRoute('list.task', [], Response::HTTP_SEE_OTHER);
+        }
+        if ($user !== $task->getUser()) {
+            $this->addFlash('error', 'Vous n\'êtes pas le créateur de cette tâches');
+            return $this->redirectToRoute('list.task', [], Response::HTTP_SEE_OTHER);
+        }
         if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($task);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Task Modifié correctement');
+            $this->addFlash('success', 'Task supprimé correctement');
             return $this->redirectToRoute('list.task', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -238,14 +246,22 @@ class TaskController extends AbstractController
      * @codeCoverageIgnore
      */
     #[Route('/{id}/deleted-old', name: 'deleted.task-old', methods: ['POST'])]
-    public function deleteOld(Request $request, Task $task, EntityManagerInterface $entityManager): Response
+    public function deleteOld(Request $request, #[CurrentUser()] ?User $user, Task $task, EntityManagerInterface $entityManager): Response
     {
+        if (in_array("ROLE_ADMIN", $user->getRoles()) && $task->getUser()->getUsername() === "anonyme") {
+            $this->addFlash('success', 'Task supprimé correctement');
+            return $this->redirectToRoute('list.task-old', [], Response::HTTP_SEE_OTHER);
+        }
+        if ($user !== $task->getUser()) {
+            $this->addFlash('error', 'Vous n\'êtes pas le créateur de cette tâches');
+            return $this->redirectToRoute('list.task-old', [], Response::HTTP_SEE_OTHER);
+        }
         if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($task);
             $entityManager->flush();
 
-            $this->addFlash('success', 'TaskOld Modifié correctement');
-            return $this->redirectToRoute('list.task', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'TaskOld supprimé correctement');
+            return $this->redirectToRoute('list.task-old', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->redirectToRoute('list.task-old', [], Response::HTTP_SEE_OTHER);

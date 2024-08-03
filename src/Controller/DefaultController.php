@@ -25,6 +25,7 @@ class DefaultController extends AbstractController
      * @codeCoverageIgnore
      */
     #[Route('/homepage-old', name: 'homepage-old')]
+    #[IsGranted('IS_AUTHENTICATED')]
     public function homepageOld(): Response
     {
         $this->addFlash('success', 'Bienvenu dans votre Todo List');

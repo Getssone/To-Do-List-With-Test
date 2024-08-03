@@ -245,11 +245,13 @@ class TaskControllerTest extends WebTestCase
         $this->assertSelectorTextContains('.alert.alert-success', "Superbe ! Task Modifié correctement");
     }
 
-    public function testDeleteTaskSuccessFull()
+    public function testEditDeleteTaskSuccessFull()
     {
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
         $repository = $entityManager->getRepository(Task::class);
         $task = $entityManager->getRepository(Task::class)->findOneBy([], ['id' => 'ASC']);
+        $user = $task->getUser();
+        $this->client->loginUser($user);
         $this->crawler = $this->client->request('GET', $this->getPath('edit.task', ['id' => $task->getId()]));
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('.btn.btn-danger.btn-sm.pull-right');
@@ -265,9 +267,34 @@ class TaskControllerTest extends WebTestCase
         $foundTask = $repository->findOneBy(['id' => $task->getId()]);
         $this->assertNull($foundTask);
     }
+
     public function testDeletedSimple()
     {
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $task = $entityManager->getRepository(Task::class)->findOneBy([], ['id' => 'DESC']);
+        $user = $task->getUser();
+        $this->client->loginUser($user);
+        $this->crawler = $this->client->request('GET', $this->getPath('list.task', ['q' => 'done']));
+        $this->assertResponseIsSuccessful();
+        $buttonCrawlerNode =  $this->crawler->selectButton('Sup. Tâche');
+        $this->assertCount(4, $buttonCrawlerNode);
+        $form = $buttonCrawlerNode->form();
+        $this->assertSame("return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');", $form->getFormNode()->getAttribute('onsubmit'));
+        $this->assertSame('Sup. Tâche', $buttonCrawlerNode->text());
+        $this->assertSame('/' . $task->getId() . '/deleted', $form->getFormNode()->getAttribute('action'));
+        $this->client->submit($form);
+        $this->client->followRedirect();
+        $this->client->getCrawler();
+        $this->assertSelectorTextContains('.alert.alert-success', "Superbe ! Task supprimé correctement");
+    }
+
+    public function testCantDeleted()
+    {
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $user = (new User())->setEmail('testCantDeleted@testCantDeleted.com')->setUsername('testCantDeleted')->setPlainPassword('validpassword123')->setRoles(["ROLE_USER"]);
+        $entityManager->persist($user);
+        $entityManager->flush();
+        $this->client->loginUser($user);
         $task = $entityManager->getRepository(Task::class)->findOneBy([], ['id' => 'DESC']);
         $this->crawler = $this->client->request('GET', $this->getPath('list.task', ['q' => 'done']));
         $this->assertResponseIsSuccessful();
@@ -278,11 +305,29 @@ class TaskControllerTest extends WebTestCase
         $this->assertSame('Sup. Tâche', $buttonCrawlerNode->text());
         $this->assertSame('/' . $task->getId() . '/deleted', $form->getFormNode()->getAttribute('action'));
         $this->client->submit($form);
-        // Vérification après soumission
         $this->client->followRedirect();
-
         $this->client->getCrawler();
-        $this->assertSelectorTextContains('.alert.alert-success', "Superbe ! Task Modifié correctement");
+        $this->assertSelectorTextContains('.alert.alert-danger', "Oops ! Vous n'êtes pas le créateur de cette tâches");
+    }
+    public function testTaskAnonymeDeleted()
+    {
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $task = $entityManager->getRepository(Task::class)->findOneBy([], ['id' => 'DESC']);
+        $user = $this->isConnected();
+        $userAnonyme = $task->getUser()->getUsername();
+        $this->assertEquals('anonyme', $userAnonyme);
+        $this->assertEquals(['ROLE_USER', 'ROLE_ADMIN'], $user->getRoles());
+        $this->crawler = $this->client->request('GET', $this->getPath('list.task', ['q' => 'done']));
+        $this->assertResponseIsSuccessful();
+        $buttonCrawlerNode =  $this->crawler->selectButton('Sup. Tâche');
+        $this->assertCount(4, $buttonCrawlerNode);
+        $form = $buttonCrawlerNode->form();
+        $this->assertSame("return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');", $form->getFormNode()->getAttribute('onsubmit'));
+        $this->assertSame('Sup. Tâche', $buttonCrawlerNode->text());
+        $this->assertSame('/' . $task->getId() . '/deleted', $form->getFormNode()->getAttribute('action'));
+        $this->client->submit($form);
+        $this->client->followRedirect();
+        $this->assertSelectorTextContains('.alert.alert-success', "Superbe ! Task supprimé correctement");
     }
 
     public function testAnonymeTask()
