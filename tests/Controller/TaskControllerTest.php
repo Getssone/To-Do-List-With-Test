@@ -299,15 +299,19 @@ class TaskControllerTest extends WebTestCase
         $this->crawler = $this->client->request('GET', $this->getPath('list.task', ['q' => 'done']));
         $this->assertResponseIsSuccessful();
         $buttonCrawlerNode =  $this->crawler->selectButton('Sup. Tâche');
-        $this->assertCount(4, $buttonCrawlerNode);
-        $form = $buttonCrawlerNode->form();
-        $this->assertSame("return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');", $form->getFormNode()->getAttribute('onsubmit'));
-        $this->assertSame('Sup. Tâche', $buttonCrawlerNode->text());
-        $this->assertSame('/' . $task->getId() . '/deleted', $form->getFormNode()->getAttribute('action'));
-        $this->client->submit($form);
-        $this->client->followRedirect();
-        $this->client->getCrawler();
-        $this->assertSelectorTextContains('.alert.alert-danger', "Oops ! Vous n'êtes pas le créateur de cette tâches");
+        //Si la fonction dans les view cache les button supprimer alors 0
+        $this->assertCount(0, $buttonCrawlerNode);
+
+        //Si on laisse les buttons supprimer dans les view list alors 4 avec la suite des tests
+        // $this->assertCount(4, $buttonCrawlerNode);
+        // $form = $buttonCrawlerNode->form();
+        // $this->assertSame("return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');", $form->getFormNode()->getAttribute('onsubmit'));
+        // $this->assertSame('Sup. Tâche', $buttonCrawlerNode->text());
+        // $this->assertSame('/' . $task->getId() . '/deleted', $form->getFormNode()->getAttribute('action'));
+        // $this->client->submit($form);
+        // $this->client->followRedirect();
+        // $this->client->getCrawler();
+        // $this->assertSelectorTextContains('.alert.alert-danger', "Oops ! Vous n'êtes pas le créateur de cette tâches");
     }
     public function testTaskAnonymeDeleted()
     {

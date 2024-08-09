@@ -43,7 +43,9 @@ class SecurityController extends AbstractController
             'error' => $error,
         ]);
     }
-
+    /**
+     * @codeCoverageIgnore
+     */
     #[Route(path: '/logout', name: 'logout')]
     public function logout(): void
     {

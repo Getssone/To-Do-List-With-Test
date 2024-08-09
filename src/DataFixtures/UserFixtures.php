@@ -19,7 +19,7 @@ class UserFixtures extends Fixture
             $user = new User();
             $user->setEmail('user' . $i . '@testy.fr');
             $user->setUsername('user' . $i);
-            $user->setPlainPassword('0000');
+            $user->setPlainPassword('validpassword123');
             $user->setRoles(['ROLE_USER']);
             $manager->persist($user);
         }

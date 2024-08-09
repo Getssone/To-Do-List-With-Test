@@ -26,9 +26,16 @@
 						</h4>
 						<p class='cropsText'>{{ task.content }}</p>
 					</div>
+					<p class='d-flex justify-content-end cropsText'>
+						<strong>
+							{{ task.user.username }}
+						</strong>
+					</p>
 					<div>
 						{{ include ("task/_isDone_form.html.twig",{'button_label': 'Update'}) }}
-						{{ include ("task/_delete_form.html.twig",{'button_label': 'Sup. Tâche'}) }}
+						{% if app.user is  same as task.user or is_granted('ROLE_ADMIN')  %}
+							{{ include ("task/_delete_form.html.twig",{'button_label': 'Sup. Tâche'}) }}
+						{% endif %}
 					</div>
 				</div>
 			</div>

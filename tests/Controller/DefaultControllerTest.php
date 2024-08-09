@@ -161,9 +161,28 @@ class DefaultControllerTest extends WebTestCase
     }
 
     // Connecté
-    public function testLinkToConnexionIfLoggedIn()
+    public function testLinkToConnexionIfLoggedInAdmin()
     {
         $testUser = $this->userRepository->findOneByEmail('test@example.com');
+
+        // Vérifier que l'utilisateur n'est pas null
+        $this->assertNotNull($testUser, 'L\'utilisateur doit être présent dans la base de données.');
+
+        $this->client->loginUser($testUser);
+        //Ici on relance la page pour effectuer la connexion
+        $this->client->request('GET', $this->urlGenerator->generate('homepage'));
+        $this->assertResponseIsSuccessful();
+        $loggedUser = $this->client->getContainer()->get('security.token_storage')->getToken()->getUser();
+        $this->assertEquals($testUser->getEmail(), $loggedUser->getEmail(), "L\'utilisateur connecté doit être le même que celui utilisé pour la connexion.");
+
+        $this->assertSelectorExists("a[href='/logout']");
+        $this->assertSelectorNotExists("a[href='/login']");
+        $this->assertSelectorExists("a[href='/register']");
+        $this->assertSelectorTextContains(".userLogout.pull-right.btn-outline-secondary", "Se déconnecter");
+    }
+    public function testLinkToConnexionIfLoggedInClient()
+    {
+        $testUser = $this->userRepository->findOneByEmail('user0@testy.fr');
 
         // Vérifier que l'utilisateur n'est pas null
         $this->assertNotNull($testUser, 'L\'utilisateur doit être présent dans la base de données.');
