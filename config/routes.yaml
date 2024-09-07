@@ -7,4 +7,13 @@ controllers:
 # Force le chemin en cas de besoin pour certain navigateur
 index:
   path: /
-  controller: App\Controller\DefaultController::homepage
+  controller: App\Controller\SecurityController::login
+
+login:
+  path: /login
+  controller: App\Controller\SecurityController::login
+
+# Route pour la déconnexion
+logout:
+  path: /logout
+  controller: App\Controller\SecurityController::logout

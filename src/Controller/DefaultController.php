@@ -10,8 +10,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DefaultController extends AbstractController
 {
 
-    #[Route('/homepage', name: 'homepage')]
     #[IsGranted('IS_AUTHENTICATED')]
+    #[Route('/homepage', name: 'homepage')]
     public function homepage(): Response
     {
         $this->addFlash('success', 'Bienvenu dans votre Todo List');
@@ -24,8 +24,8 @@ class DefaultController extends AbstractController
     /**
      * @codeCoverageIgnore
      */
-    #[Route('/homepage-old', name: 'homepage-old')]
     #[IsGranted('IS_AUTHENTICATED')]
+    #[Route('/homepage-old', name: 'homepage-old')]
     public function homepageOld(): Response
     {
         $this->addFlash('success', 'Bienvenu dans votre Todo List');

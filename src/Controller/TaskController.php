@@ -13,9 +13,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TaskController extends AbstractController
 {
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/new-task', name: 'new.task')]
     public function createTask(Request $request, EntityManagerInterface $entityManager, #[CurrentUser()] ?User $user): Response
     {
@@ -53,6 +55,7 @@ class TaskController extends AbstractController
     /**
      * @codeCoverageIgnore
      */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/new-task-old', name: 'new.task-old')]
     public function createTaskOld(Request $request, EntityManagerInterface $entityManager, #[CurrentUser()] ?User $user): Response
     {
@@ -86,7 +89,7 @@ class TaskController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/list-task', name: 'list.task')]
     public function listTask(TaskRepository $taskRepos, Request $request): Response
     {
@@ -107,6 +110,7 @@ class TaskController extends AbstractController
     /**
      * @codeCoverageIgnore
      */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/list-task-old', name: 'list.task-old')]
     public function listTaskOld(TaskRepository $taskRepos, Request $request): Response
     {
@@ -124,6 +128,7 @@ class TaskController extends AbstractController
         ]);
     }
 
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/{id}/edit', name: 'edit.task', methods: ['GET', 'POST'])]
     public function edit(Request $request, Task $task, EntityManagerInterface $entityManager): Response
     {
@@ -157,6 +162,7 @@ class TaskController extends AbstractController
     /**
      * @codeCoverageIgnore
      */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/{id}/edit-old', name: 'edit.task-old', methods: ['GET', 'POST'])]
     public function editOld(Request $request, Task $task, EntityManagerInterface $entityManager): Response
     {
@@ -185,6 +191,7 @@ class TaskController extends AbstractController
             'form' => $form
         ]);
     }
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/{id}/isDone', name: 'isDone.task', methods: ['POST'])]
     public function isDone(Request $request, Task $task, TaskRepository $taskRepository, EntityManagerInterface $entityManager): Response
     {
@@ -204,6 +211,7 @@ class TaskController extends AbstractController
     /**
      * @codeCoverageIgnore
      */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/{id}/isDone-old', name: 'isDone.task-old', methods: ['POST'])]
     public function isDoneOld(Request $request, Task $task, TaskRepository $taskRepository, EntityManagerInterface $entityManager): Response
     {
@@ -220,6 +228,7 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('list.task-old', [], Response::HTTP_SEE_OTHER);
     }
 
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/{id}/deleted', name: 'deleted.task', methods: ['POST'])]
     public function delete(Request $request, #[CurrentUser()] ?User $user, Task $task, EntityManagerInterface $entityManager): Response
     {
@@ -244,6 +253,7 @@ class TaskController extends AbstractController
     /**
      * @codeCoverageIgnore
      */
+    #[IsGranted('IS_AUTHENTICATED')]
     #[Route('/{id}/deleted-old', name: 'deleted.task-old', methods: ['POST'])]
     public function deleteOld(Request $request, #[CurrentUser()] ?User $user, Task $task, EntityManagerInterface $entityManager): Response
     {
