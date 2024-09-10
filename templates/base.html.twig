@@ -47,7 +47,7 @@
 				{% block header_img %}
 					<img class="todoListIcon" src="{{ asset('img/todolist_homepage.png') }}" alt="todo list">
 					{% for flash_message in app.session.flashBag.get('success') %}
-						<div class="alert alert-success alert-dismissible fade show" role="alert">
+						<div class="m-2 w-50 alert alert-success alert-dismissible fade show" role="alert">
 							<strong class="message-title">Superbe !</strong>
 							<p class="message-success">
 								{{ flash_message }}
@@ -56,7 +56,7 @@
 						</div>
 					{% endfor %}
 					{% for flash_message in app.session.flashBag.get('info') %}
-						<div class="alert alert-info alert-dismissible fade show" role="alert">
+						<div class="m-2 w-50 alert alert-info alert-dismissible fade show" role="alert">
 							<strong class="message-title">Info !</strong>
 							<p class="message-info">
 								{{ flash_message }}
@@ -66,7 +66,7 @@
 					{% endfor %}
 
 					{% for flash_message in app.session.flashBag.get('error') %}
-						<div class="alert alert-danger alert-dismissible fade show" role="alert">
+						<div class="m-2 w-50 alert alert-danger alert-dismissible fade show" role="alert">
 							<strong class="message-title">Oops !</strong>
 							<p class="message-danger">
 								{{ flash_message }}
