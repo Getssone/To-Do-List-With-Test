@@ -44,23 +44,26 @@ class TaskControllerTest extends WebTestCase
         }
         return false;
     }
-    public function testUserNotConnectedViaFlashBag(): void
-    {
-        $session = $this->client->getRequest()->getSession();
-        $flashBag = $session->getFlashBag();
-        $ArrayFlash = json_decode(json_encode($flashBag->get('error'))); //convertir le tableau "error" en une chaîne de caractères JSON. Puis re convertir une chaîne de caractères JSON en un objet PHP
-        $this->assertCount(1, $ArrayFlash);
-        $this->assertEquals('il faut être connecté pour pouvoir enregistrer une tâche', $ArrayFlash[0]);
-    }
 
-    public function testUserNotConnected(): void
-    {
+    //NE PEU PLUS FONCTIONNER SUITE A L'AJOUT DES ATTRIBUTS #[IsGranted('IS_AUTHENTICATED')]
+    // public function testUserNotConnectedViaFlashBag(): void
+    // {
+    //     $session = $this->client->getRequest()->getSession();
+    //     $flashBag = $session->getFlashBag();
+    //     $ArrayFlash = json_decode(json_encode($flashBag->get('error'))); //convertir le tableau "error" en une chaîne de caractères JSON. Puis re convertir une chaîne de caractères JSON en un objet PHP
+    //     $this->assertCount(1, $ArrayFlash);
+    //     $this->assertEquals('il faut être connecté pour pouvoir enregistrer une tâche', $ArrayFlash[0]);
+    // }
 
-        $this->assertResponseRedirects($this->getPath('login'));;
+    //NE PEU PLUS FONCTIONNER SUITE A L'AJOUT DES ATTRIBUTS #[IsGranted('IS_AUTHENTICATED')]
+    // public function testUserNotConnected(): void
+    // {
 
-        $this->client->followRedirect();
-        $this->assertSelectorTextContains('.alert.alert-danger.alert-dismissible.fade.show .message-danger', 'il faut être connecté pour pouvoir enregistrer une tâche');
-    }
+    //     $this->assertResponseRedirects($this->getPath('login'));;
+
+    //     $this->client->followRedirect();
+    //     $this->assertSelectorTextContains('.alert.alert-danger.alert-dismissible.fade.show .message-danger', 'il faut être connecté pour pouvoir enregistrer une tâche');
+    // }
 
     public function testConnectionPage(): void
     {
@@ -138,6 +141,7 @@ class TaskControllerTest extends WebTestCase
 
     public function testListWithQueryParameterDone()
     {
+        $this->isConnected();
         $url = $this->getPath('list.task', ['q' => 'done']);
 
         // Requête pour la page de la liste des tâches avec le paramètre de requête
@@ -149,12 +153,12 @@ class TaskControllerTest extends WebTestCase
         // Vérification que le titre de la page est correct
         $this->assertPageTitleContains("Liste des tâches");
 
-        // dd($this->crawler);
         // Vérification qu'il y a un message ou un élément indiquant qu'il n'y a pas de tâches
         $this->assertSelectorExists('.glyphicon.glyphicon-ok');
     }
     public function testListWithQueryParameterNotDone()
     {
+        $user = $this->isConnected();
         $url = $this->getPath('list.task', ['q' => 'notDone']);
 
         // Requête pour la page de la liste des tâches avec le paramètre de requête
@@ -172,24 +176,8 @@ class TaskControllerTest extends WebTestCase
 
     public function testListWithoutData()
     {
-        //Mock d'une Donnée ne fonctionne pas 
-        // $taskRepositoryMock = $this->createMock(TaskRepository::class);
-
-        // // Configure le mock pour renvoyer une liste vide
-        // $taskRepositoryMock->expects(self::once())
-        //     ->method('findAll')->willReturn([]);
-        // // $this->client->enableReboot();
-        // $this->container->set(TaskRepository::class, $taskRepositoryMock);
-        // // Verify that the mock object is correctly set in the container
-        // $this->assertSame(
-        //     $taskRepositoryMock,
-        //     $this->container->get(TaskRepository::class)
-        // );
-        //     $this->assertPageTitleContains("Liste des tâches");
-        //     $this->assertSelectorTextContains('.alert.alert-warning', "Il n'y a pas encore de tâche enregistrée.");
-
-        //DAMA\DoctrineTestBundle permet de ne pas enregistrer les actions sur la base de données ce qui nous permet de :
         // Nettoyer la BDD 
+        $this->isConnected();
         $em = $this->container->get('doctrine')->getManager();
         $em->createQuery('DELETE FROM App\Entity\Task')->execute();
         $this->client->request('GET', $this->getPath('list.task'));
@@ -202,6 +190,7 @@ class TaskControllerTest extends WebTestCase
 
     public function testEditTaskWithInvalidContent()
     {
+        $this->isConnected();
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
         $task = $entityManager->getRepository(Task::class)->findOneBy([], ['id' => 'ASC']);
         $this->crawler = $this->client->request('GET', $this->getPath('edit.task', ['id' => $task->getId()]));
@@ -214,6 +203,7 @@ class TaskControllerTest extends WebTestCase
 
     public function testEditTaskSuccessFull()
     {
+        $this->isConnected();
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
         $task = $entityManager->getRepository(Task::class)->findOneBy([], ['id' => 'ASC']);
         $this->crawler = $this->client->request('GET', $this->getPath('edit.task', ['id' => $task->getId()]));
@@ -227,6 +217,7 @@ class TaskControllerTest extends WebTestCase
     }
     public function testEditSimple()
     {
+        $this->isConnected();
         $entityManager = $this->container->get('doctrine.orm.entity_manager');
         $task = $entityManager->getRepository(Task::class)->findOneBy([], ['id' => 'DESC']);
         $this->crawler = $this->client->request('GET', $this->getPath('list.task', ['q' => 'done']));

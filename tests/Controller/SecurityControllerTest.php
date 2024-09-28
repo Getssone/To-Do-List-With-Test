@@ -93,8 +93,6 @@ class SecurityControllerTest extends WebTestCase
     }
     public function testLogout()
     {
-        $client = $this->client;
-
         $userRepository = $this->container->get(UserRepository::class);
         $testUser = $userRepository->findOneByEmail('test@example.com');
 
@@ -104,6 +102,6 @@ class SecurityControllerTest extends WebTestCase
 
         // make a GET request to the logout route
         $this->client->request('GET', $this->getPath('logout'));
-        $this->assertResponseRedirects('/homepage');
+        $this->assertResponseRedirects('/login');
     }
 }
