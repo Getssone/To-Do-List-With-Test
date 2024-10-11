@@ -6,6 +6,9 @@ use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
+/**
+ * @codeCoverageIgnore
+ */
 class UserFixtures extends Fixture
 {
 
@@ -13,11 +16,11 @@ class UserFixtures extends Fixture
     {
 
         for ($i = 0; $i < 10; $i++) {
-            $user = (new User())
-                ->setUsername('user' . $i)
-                ->setEmail('user' . $i . '@test.fr')
-                ->setPassword("0000")
-                ->setRoles(['ROLE_USER']);
+            $user = new User();
+            $user->setEmail('user' . $i . '@testy.fr');
+            $user->setUsername('user' . $i);
+            $user->setPlainPassword('validpassword123');
+            $user->setRoles(['ROLE_USER']);
             $manager->persist($user);
         }
         $manager->flush();

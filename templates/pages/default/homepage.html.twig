@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Welcome To Do List !
+{% endblock %}
+
+{% block body %}
+	<style>
+		.example-wrapper {
+			margin: 1em auto;
+			max-width: 800px;
+			width: 95%;
+			font: 18px / 1.5 sans-serif;
+		}
+		.example-wrapper code {
+			background: #F5F5F5;
+			padding: 2px 6px;
+		}
+	</style>
+
+	<div class="row d-flex gap-3">
+		<a class="newTasks btn btn-success" href="{{path('new.task')}}">Créer une nouvelle tâche</a>
+		<a class="toDoTasks btn btn-info" href="{{path('list.task',{'q':'notDone'})}}">Consulter la liste des tâches à faire</a>
+		<a class="completedTasks btn btn-secondary" href="{{path('list.task',{'q':'done'})}}">
+			Consulter la liste des tâches terminées</a>
+	</div>
+{% endblock %}

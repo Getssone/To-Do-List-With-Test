@@ -2,14 +2,17 @@
 
 namespace App\Entity;
 
+use App\EntityListener\TaskListener;
 use App\Repository\TaskRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
+// #[ORM\EntityListeners([TaskListener::class])]
 class Task
 {
     #[ORM\Id]
@@ -17,12 +20,9 @@ class Task
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var DateTime A "Y-m-d H:i:s" formatted value
-     */
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: false)]
     #[Assert\NotBlank(message: "Vérifier dans votre contrôleur qu'une date de création est bien renseigné")]
-    #[Assert\DateTime]
+    // #[Assert\DateTime]
     private ?DateTimeInterface $createdAt = null;
 
     #[ORM\Column(length: 180, nullable: false)]
@@ -36,6 +36,10 @@ class Task
 
     #[ORM\Column(nullable: false)]
     private bool $isDone = false;
+
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -55,6 +59,9 @@ class Task
 
     public function setCreatedAt(DateTime $createdAt): static
     {
+        if ($createdAt === null) {
+            $this->createdAt = new DateTime();
+        }
         $this->createdAt = $createdAt;
 
         return $this;
@@ -89,7 +96,7 @@ class Task
         return $this->isDone;
     }
 
-    public function setIsDone(bool $isDone): static
+    public function setIsDone(bool $isDone = false): static
     {
         if (!is_bool($isDone)) {
             throw new \InvalidArgumentException("La valeur de 'isDone' doit être un booléen.");
@@ -101,4 +108,16 @@ class Task
 
     //enlèvement de la function toggle($flag) car redondant avec la function setDone($isDone) 
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+
+        return $this;
+    }
 }

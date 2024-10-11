@@ -1,0 +1,7 @@
+<form method="post" action="{{ path('isDone.task', {'id': task.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir modifier cet tâche ?');">
+	<input type="hidden" name="_token" value="{{ csrf_token('isDone' ~ task.id) }}">
+	<button type="submit" class="btn btn-success btn-sm pull-right">
+		{% if not task.isDone %}Marquer comme faite{% else %}Marquer non terminée
+		{% endif %}
+	</button>
+</form>

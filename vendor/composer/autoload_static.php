@@ -135,6 +135,10 @@ class ComposerStaticInitabab989af4fef9ea3032de569a28a37c
         array (
             'Liip\\TestFixturesBundle\\' => 24,
         ),
+        'F' => 
+        array (
+            'Faker\\' => 6,
+        ),
         'E' => 
         array (
             'Egulias\\EmailValidator\\' => 23,
@@ -518,6 +522,10 @@ class ComposerStaticInitabab989af4fef9ea3032de569a28a37c
         array (
             0 => __DIR__ . '/..' . '/liip/test-fixtures-bundle/src',
         ),
+        'Faker\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/fakerphp/faker/src/Faker',
+        ),
         'Egulias\\EmailValidator\\' => 
         array (
             0 => __DIR__ . '/..' . '/egulias/email-validator/src',
@@ -572,8 +580,8 @@ class ComposerStaticInitabab989af4fef9ea3032de569a28a37c
         ),
         'Doctrine\\Common\\' => 
         array (
-            0 => __DIR__ . '/..' . '/doctrine/event-manager/src',
-            1 => __DIR__ . '/..' . '/doctrine/common/src',
+            0 => __DIR__ . '/..' . '/doctrine/common/src',
+            1 => __DIR__ . '/..' . '/doctrine/event-manager/src',
         ),
         'Doctrine\\Bundle\\MigrationsBundle\\' => 
         array (

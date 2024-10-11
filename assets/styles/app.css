@@ -1,3 +1,12 @@
+@import url("./base.css");
 body {
-    background-color: skyblue;
+  background-color: skyblue;
+}
+img {
+  width: 2rem;
+  height: 2rem;
+}
+.iconeDone {
+  width: 1.2rem;
+  height: 1.2rem;
 }
