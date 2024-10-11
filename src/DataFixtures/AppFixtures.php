@@ -26,8 +26,8 @@ class AppFixtures extends Fixture
         $user->setUsername('validusername');
         $user->setPlainPassword('validpassword123');
         $user->setRoles(["ROLE_USER", "ROLE_ADMIN"]);
-
         $manager->persist($user);
+
         $userAnonyme = new User();
         $userAnonyme->setEmail('anonyme@example.com');
         $userAnonyme->setUsername('anonyme');

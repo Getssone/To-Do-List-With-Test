@@ -26,7 +26,7 @@ class RegistrationController extends AbstractController
 
         if (!$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error', 'Vous n\'avez pas les droits suffisants pour créer un utilisateur');
-            return $this->redirectToRoute('login');
+            return $this->redirectToRoute('homepage');
         }
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);

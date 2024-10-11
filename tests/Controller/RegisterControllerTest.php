@@ -48,7 +48,7 @@ class RegisterControllerTest extends WebTestCase
 
     public function testNoAdmin()
     {
-        $this->assertResponseRedirects($this->getPath('login'));
+        $this->assertResponseRedirects($this->getPath('homepage'));
     }
     public function testShowRegisterForm()
     {

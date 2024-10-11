@@ -34,11 +34,22 @@ class UserControllerTest extends WebTestCase
         return $url;
     }
 
+    public function isConnected(): ?User
+    {
+        $userRepository = $this->container->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('test@example.com');
+        if ($testUser) {
+            $this->client->loginUser($testUser);
+            return $testUser;
+        }
+        return false;
+    }
 
     public function testEditUser(): void
     {
         $em = $this->container->get('doctrine.orm.entity_manager');
         $user = $em->getRepository(User::class)->findOneBy([], ['id' => 'ASC']);
+        $this->isConnected();
         $this->crawler = $this->client->request('GET', $this->getPath('edit.user', ['id' => $user->getId()]));
         $this->assertResponseIsSuccessful();
         $this->assertPageTitleContains('Modifier' . ' ' . $user->getUsername());
@@ -63,6 +74,7 @@ class UserControllerTest extends WebTestCase
     {
         $em = $this->container->get('doctrine.orm.entity_manager');
         $repository = $em->getRepository(User::class);
+        $this->isConnected();
         $fixture = new User();
         $fixture->setEmail('Value');
         $fixture->setUsername('Value');

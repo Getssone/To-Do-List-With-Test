@@ -5,11 +5,11 @@
 
 {% block body %}
 	<a href="{{ path('new.task') }}" class="btn btn-info pull-right">Créer une tâche</a>
-	<div class="row">
+	<div class="row d-flex justify-content-center w-100">
 		{% for task in tasks %}
-			<div class="col-sm-4 col-lg-4 col-md-4">
-				<div class="thumbnail">
-					<div class="caption">
+			<div class="col-sm-4 col-lg-4 col-md-4 d-flex flex-column align-items-center justify-content-center p-4">
+				<div class="thumbnail d-flex flex-column align-items-center justify-content-center border border-dark p-2">
+					<div class="d-flex flex-column caption h-100">
 						<h4 class="pull-right">
 							{% if task.isDone %}
 								<span class="glyphicon glyphicon-ok">
@@ -21,12 +21,12 @@
 								</span>
 							{% endif %}
 						</h4>
-						<h4>
+						<h4 class="text-wrap">
 							<a href="{{ path('edit.task', {'id' : task.id }) }}">{{ task.title }}</a>
 						</h4>
 						<p class='cropsText'>{{ task.content }}</p>
 					</div>
-					<p class='d-flex justify-content-end cropsText'>
+					<p class='d-flex justify-content-center align-items-center  cropsText p-2'>
 						<strong>
 							{{ task.user.username }}
 						</strong>

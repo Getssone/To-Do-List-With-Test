@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class UserController extends AbstractController
 {
@@ -21,10 +21,16 @@ class UserController extends AbstractController
     //         'controller_name' => 'UserController',
     //     ]);
     // }
+
+    // #[IsGranted('ROLE_ADMIN', message: "Vous n'avez pas les droits suffisants pour créer un utilisateur")] // intéressant à utiliser mais ne peut apporter le message dans les addFlashs
     #[Route('/list-user', name: 'list.user')]
     public function listTask(UserRepository $userRepos, Request $request): Response
     {
 
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Vous n\'avez pas les droits suffisants pour voir la liste des utilisateurs');
+            return $this->redirectToRoute('homepage');
+        }
         $usersRequest = $userRepos->findAllDESC();
 
         return $this->render('pages/user/list.html.twig', [
@@ -38,6 +44,10 @@ class UserController extends AbstractController
     #[Route('/list-user-old', name: 'list.user.old')]
     public function listTaskOld(UserRepository $userRepos, Request $request): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Vous n\'avez pas les droits suffisants pour voir la liste des utilisateurs');
+            return $this->redirectToRoute('homepage');
+        }
 
         $usersRequest = $userRepos->findAllDESC();
 
@@ -49,6 +59,11 @@ class UserController extends AbstractController
     #[Route('/{id}/edit-user', name: 'edit.user', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Vous n\'avez pas les droits suffisants pour modifier un user');
+            return $this->redirectToRoute('homepage');
+        }
+
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
@@ -87,6 +102,11 @@ class UserController extends AbstractController
     #[Route('/{id}/edit-user-old', name: 'edit.user.old', methods: ['GET', 'POST'])]
     public function editOld(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
+
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Vous n\'avez pas les droits suffisants pour modifier un user');
+            return $this->redirectToRoute('homepage');
+        }
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
@@ -113,6 +133,11 @@ class UserController extends AbstractController
     #[Route('/{id}/deleted-user', name: 'deleted.user', methods: ['POST'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
+
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Vous n\'avez pas les droits suffisants pour supprimer un user');
+            return $this->redirectToRoute('homepage');
+        }
         if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($user);
             $entityManager->flush();
@@ -127,6 +152,10 @@ class UserController extends AbstractController
     #[Route('/{id}/deleted-user-old', name: 'deleted.user.old', methods: ['POST'])]
     public function deleteOld(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Vous n\'avez pas les droits suffisants pour supprimer un user');
+            return $this->redirectToRoute('homepage');
+        }
         if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($user);
             $entityManager->flush();
